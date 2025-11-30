@@ -1,0 +1,175 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Visualización de datos espaciales con R",
+    "section": "",
+    "text": "Prefacio\nEn este taller exploramos aspectos prácticos del diseño, implementación y evaluación de modelos de aprendizaje automático no supervisado. Estos modelos pueden aplicarse en diversos problemas en los que no contamos con una serie de ejemplos de aprendizaje previamente resueltos. Por tanto, el objetivo principal de estos algoritmos será descubrir patrones interesantes o ayudarnos a sintentizar la información contenida en conjuntos de datos complejos (en muchos casos, en espacios de representación de alta dimensionalidad y con alta dispersión de valores).\nEste es un taller práctico, que presenta ejemplos reales y comandos para entrenar, evaluar y aplicar modelos de aprendizaje automático no supervisado con R. Además, junto a la explicación de los conceptos clave para entender este proceso también se ofrecen recomendaciones sobre buenas prácticas metodológicas para comparar y elegir el algoritmo o modelo más adecuado para una aplicación específica, así como herramientas para evaluar e interpretar mejor los resultados obtenidos.\nLos apuntes para este taller práctico se han realizado con Quarto, una herramienta para creación de documentación científica y programación literaria compatible con R y otros lenguajes de programación científica.",
+    "crumbs": [
+      "Prefacio"
+    ]
+  },
+  {
+    "objectID": "index.html#requisitos-previos",
+    "href": "index.html#requisitos-previos",
+    "title": "Visualización de datos espaciales con R",
+    "section": "Requisitos previos",
+    "text": "Requisitos previos\nPara poder realizar los ejemplos inlcuidos en este taller necesitas tener instalado R y una IDE de desarrollo para este lenguaje. Se recomienda instalar RStudio o MS Visual Code como entorno de programación.\n\nInstalación de R.\nInstalación de RStudio.\n\nAdicionalmente, es necesario instalar una serie de paquetes R antes de ejecutar los ejemplos, para que todas las dependencias estén disponibles en nuestro sistema. Consulta el Apéndice ?sec-pkg-requirements para comprobar el listado de paquetes R necesarios.",
+    "crumbs": [
+      "Prefacio"
+    ]
+  },
+  {
+    "objectID": "01-introduccion.html",
+    "href": "01-introduccion.html",
+    "title": "1  Introducción",
+    "section": "",
+    "text": "1.1 Tipos de aprendizaje automático\nExisten muchas definiciones complementarias sobre la Inteligencia Artificial (IA), cada una reflejo de un modo diferente de aproximarse al complejo problema de crear máquinas que puedan imitar la inteligencia humana (russell2010?). Por ejemplo, en el artículo de Wikipedia sobre IA se define de la siguiente forma enlace:\nEn 1950, Alan Turing propuso el llamado Test de Turing para proporcionar una definción operativa satisfactoria sobre “inteligencia”. En teoría, un computador supera el test si un interrogador humano, después de plantear varias preguntas, no es capaz de discernir si las respuestas escritas provienen de una persona o de un computador. Para poder superar el test, un computador necesitaría incluir muchas habilidades. Aunque el test original no lo contemplaba, el llamado Test de Turing total incorpora una señal de vídeo para que el interrogador pueda evaluar las habilidades de percepción y reacción físicas del sujeto. Entre otros aspectos, esto implica contar con habilidades como:\nPor tanto, vemos que el aprendizaje automático (machine learning o ML en inglés) es una rama de la IA que tiene por objetivo el desarrollo de técnicas y métodos para que las computadoras aprendan. Un agente inteligente aprende cuando es capaz de mejorar su rendimiento a partir de la experiencia y de la información extraída de datos.\nExiste una taxonomía ampliamente aceptada para clasificar las diferentes aproximaciones para resolver el problema del aprendizaje automático (russell2010?):",
+    "crumbs": [
+      "Fundamentos",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introducción</span>"
+    ]
+  },
+  {
+    "objectID": "01-introduccion.html#tipos-de-aprendizaje-automático",
+    "href": "01-introduccion.html#tipos-de-aprendizaje-automático",
+    "title": "1  Introducción",
+    "section": "",
+    "text": "Aprendizaje supervisado: el agente observa algunos ejemplos de parejas de valores entrada-salida y aprende una función que mapea nuevas entradas a nuevos valores de salida.\nAprendizaje no supervisado: el agente debe descubrir patrones o similitudes entre los valores de entrada aunque no se le haya facilitado ningún tipo de información adicional.\nAprendizaje semisupervisado: combina los dos anteriores, puesto que el agente recibe sólo unos pocos ejemplos y, a partir de ellos, tiene que hacer lo posible por descubrir patrones en una colección de ejemplos no etiquetados o explicados.\nAprendizaje por refuerzo: el método de aprendizaje implica que el agente reciba premios o castigos. Por ejemplo, si un agente aprende a jugar al ajedrez y recibe dos puntos por haber ganado una partida, deduce que lo ha hecho bien. Por contra, si un agente de conducción registra un aviso de choque recibe una penalización para indicarle que lo ha hecho mal.",
+    "crumbs": [
+      "Fundamentos",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introducción</span>"
+    ]
+  },
+  {
+    "objectID": "01-introduccion.html#tareas-de-aprendizaje-automático-no-supervisado",
+    "href": "01-introduccion.html#tareas-de-aprendizaje-automático-no-supervisado",
+    "title": "1  Introducción",
+    "section": "1.2 Tareas de aprendizaje automático no supervisado",
+    "text": "1.2 Tareas de aprendizaje automático no supervisado\n\n1.2.1 Clustering\n\n\n1.2.2 Reducción de dimensionalidad",
+    "crumbs": [
+      "Fundamentos",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introducción</span>"
+    ]
+  },
+  {
+    "objectID": "02-ml-no-supervisado.html",
+    "href": "02-ml-no-supervisado.html",
+    "title": "2  Aprendizaje máquina no supervisado",
+    "section": "",
+    "text": "Ejemplos de algoritmos de cada clase",
+    "crumbs": [
+      "Fundamentos",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Aprendizaje máquina no supervisado</span>"
+    ]
+  },
+  {
+    "objectID": "03-clust-part.html",
+    "href": "03-clust-part.html",
+    "title": "3  Clustering particionado",
+    "section": "",
+    "text": "Ejemplos de algoritmos de cada clase",
+    "crumbs": [
+      "Clustering",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Clustering particionado</span>"
+    ]
+  },
+  {
+    "objectID": "04-clust-jer.html",
+    "href": "04-clust-jer.html",
+    "title": "4  Clustering jerárquico",
+    "section": "",
+    "text": "Ejemplos de algoritmos de cada clase",
+    "crumbs": [
+      "Clustering",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Clustering jerárquico</span>"
+    ]
+  },
+  {
+    "objectID": "05-mapas-auto-org.html",
+    "href": "05-mapas-auto-org.html",
+    "title": "5  Clustering jerárquico",
+    "section": "",
+    "text": "Ejemplos de algoritmos de cada clase",
+    "crumbs": [
+      "Clustering",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Clustering jerárquico</span>"
+    ]
+  },
+  {
+    "objectID": "06-reduccion-dim.html",
+    "href": "06-reduccion-dim.html",
+    "title": "6  Reducción de la dimensionalidad",
+    "section": "",
+    "text": "6.1 PCA\nEjemplos de algoritmos de cada clase",
+    "crumbs": [
+      "Reducción de dimensionalidad",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Reducción de la dimensionalidad</span>"
+    ]
+  },
+  {
+    "objectID": "06-reduccion-dim.html#pca",
+    "href": "06-reduccion-dim.html#pca",
+    "title": "6  Reducción de la dimensionalidad",
+    "section": "",
+    "text": "6.1.1 t-SNE\n\n\n6.1.2 UMAP",
+    "crumbs": [
+      "Reducción de dimensionalidad",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Reducción de la dimensionalidad</span>"
+    ]
+  },
+  {
+    "objectID": "07-autocodificadores.html",
+    "href": "07-autocodificadores.html",
+    "title": "7  Autocodificaciores",
+    "section": "",
+    "text": "7.1 Embeddings\nEjemplos de algoritmos de cada clase",
+    "crumbs": [
+      "Reducción de dimensionalidad",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Autocodificaciores</span>"
+    ]
+  },
+  {
+    "objectID": "07-autocodificadores.html#autocodificadores",
+    "href": "07-autocodificadores.html#autocodificadores",
+    "title": "7  Autocodificaciores",
+    "section": "7.2 Autocodificadores",
+    "text": "7.2 Autocodificadores",
+    "crumbs": [
+      "Reducción de dimensionalidad",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Autocodificaciores</span>"
+    ]
+  },
+  {
+    "objectID": "08-apps.html",
+    "href": "08-apps.html",
+    "title": "8  Aplicaciones",
+    "section": "",
+    "text": "Ejemplo de clustering\nEjemplo de reducc. dim.\nEjemplo de autocodif?",
+    "crumbs": [
+      "Aplicaciones",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Aplicaciones</span>"
+    ]
+  },
+  {
+    "objectID": "09-add-resources.html",
+    "href": "09-add-resources.html",
+    "title": "9  Aplicaciones",
+    "section": "",
+    "text": "Ejemplo de clustering\nEjemplo de reducc. dim.\nEjemplo de autocodif?",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Aplicaciones</span>"
+    ]
+  },
+  {
+    "objectID": "B-packages.html",
+    "href": "B-packages.html",
+    "title": "Apéndice B — Paquetes R empleados",
+    "section": "",
+    "text": "Nombre\nDescripción\n\n\n\n\ndplyr\nProcesamiento y preparación de datos\n\n\nggplot2\nRepresentaciones gráficas\n\n\npatchwork\nComposición de gráficas con ggplot2\n\n\nHmisc\nHerramientas para descripción de datos\n\n\nrsample\nTécnicas de remuestreo de datos\n\n\ncaret\nAjuste, evaluación y rendimiento de modelos\n\n\nh2o\nModelos ML avanzados y distribuidos\n\n\nAmesHousing\nDataset sobre precios de viviendas",
+    "crumbs": [
+      "Apéndices",
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Paquetes R empleados</span>"
+    ]
+  }
+]
