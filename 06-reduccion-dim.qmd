@@ -1,0 +1,11 @@
+# Reducción de la dimensionalidad
+
+Ejemplos de algoritmos de cada clase
+
+## PCA
+
+
+### t-SNE
+
+
+### UMAP

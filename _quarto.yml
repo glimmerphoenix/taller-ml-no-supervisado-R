@@ -1,0 +1,48 @@
+project:
+  type: book
+  output-dir: docs
+  preview: 
+    port: 9001
+    browser: true
+
+book:
+  title: "Visualización de datos espaciales con R"
+  author:
+    - "María Jesús Algar"
+    - "Felipe Ortega"
+  date: "2025/11/25"
+  chapters:
+    - index.qmd
+    - part: "Fundamentos"
+      chapters:
+        - 01-introduccion.qmd
+        - 02-ml-no-supervisado.qmd
+    - part: "Clustering"
+      chapters:
+        - 03-clust-part.qmd
+        - 04-clust-jer.qmd
+        - 05-mapas-auto-org.qmd
+    - part: "Reducción de dimensionalidad"
+      chapters:
+        - 06-reduccion-dim.qmd
+        - 07-autocodificadores.qmd
+    - part: "Aplicaciones"
+      chapters:
+        - 08-apps.qmd
+    - 09-add-resources.qmd
+    - references.qmd
+  appendices: 
+    - A-command-ref.qmd
+    - B-packages.qmd
+    - app-refs.qmd
+
+lang: es
+bibliography: references.bib
+csl: apa.csl
+
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+    css: styles.css

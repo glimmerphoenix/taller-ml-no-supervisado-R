@@ -1,0 +1,10 @@
+# Aplicaciones
+
+
+Ejemplo de clustering
+
+
+Ejemplo de reducc. dim.
+
+
+Ejemplo de autocodif?

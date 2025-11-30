@@ -1,0 +1,12 @@
+# Paquetes R empleados
+
+| Nombre                    | Descripción                                   |
+|:--------------------------|:----------------------------------------------|
+| `dplyr`                   | Procesamiento y preparación de datos          |
+| `ggplot2`                 | Representaciones gráficas                     |
+| `patchwork`               | Composición de gráficas con `ggplot2`         |
+| `Hmisc`                   | Herramientas para descripción de datos        |
+| `rsample`                 | Técnicas de remuestreo de datos               |
+| `caret`                   | Ajuste, evaluación y rendimiento de modelos   |
+| `h2o`                     | Modelos ML avanzados y distribuidos           |
+| `AmesHousing`             | Dataset sobre precios de viviendas            |

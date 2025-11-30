@@ -1,0 +1,35 @@
+# Prefacio {.unnumbered}
+
+En este taller exploramos aspectos prácticos del diseño, implementación y
+evaluación de modelos de aprendizaje automático no supervisado. Estos modelos
+pueden aplicarse en diversos problemas en los que no contamos con una serie
+de ejemplos de aprendizaje previamente resueltos. Por tanto, el objetivo principal
+de estos algoritmos será descubrir patrones interesantes o ayudarnos a sintentizar
+la información contenida en conjuntos de datos complejos (en muchos casos, en espacios
+de representación de alta dimensionalidad y con alta dispersión de valores).
+
+Este es un **taller práctico**, que presenta ejemplos reales y comandos para
+entrenar, evaluar y aplicar modelos de aprendizaje automático no supervisado con R. Además,
+junto a la explicación de los conceptos clave para entender este proceso también
+se ofrecen recomendaciones sobre buenas prácticas metodológicas para comparar y 
+elegir el algoritmo o modelo más adecuado para una aplicación específica, así 
+como herramientas para evaluar e interpretar mejor los resultados obtenidos.
+
+Los apuntes para este taller práctico se han realizado con 
+[Quarto](https://quarto.org), una herramienta para creación de
+documentación científica y programación literaria compatible con
+R y otros lenguajes de programación científica.
+
+## Requisitos previos
+
+Para poder realizar los ejemplos inlcuidos en este taller necesitas tener instalado
+R y una IDE de desarrollo para este lenguaje. Se recomienda instalar RStudio o MS
+Visual Code como entorno de programación.
+
+- [Instalación de R](https://cran.r-project.org/).
+- [Instalación de RStudio](https://posit.co/download/rstudio-desktop/).
+
+Adicionalmente, es necesario instalar una serie de paquetes R antes de ejecutar los
+ejemplos, para que todas las dependencias estén disponibles en nuestro sistema.
+Consulta el Apéndice [@sec-pkg-requirements] para comprobar el listado de paquetes R necesarios.
+
