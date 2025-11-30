@@ -1,10 +1,281 @@
 # Aplicaciones
 
 
-Ejemplo de clustering
+## Segmentación de clientes de un centro comercial
+
+En este caso de estudio, se analizan 200 observaciones correspondientes a clientes
+de un centro comercial. Cada registro de cliente incluye las siguientes variables:
+
+- `CustomerID`: identificador unívoco de cliente.
+- `Gender`: género.
+- `Age`: edad.
+- `Income`: salario anual.
+- `SpendingScore`: puntuación (entre 1 y 100) sobre la propensión de compra del cliente,
+basado en sus hábitos de compra y otros factores.
+
+### Resolución con *k*-means
+
+```{r}
+#| label: case-kmeans-data-pkgs
+#| message: false
+
+library(tidyverse)
+library(factoextra)
+library(gridExtra)
+library(cluster)
+library(stringr)
+
+mallcustomers <- read_csv("data/mallcustomers.csv")
+glimpse(mallcustomers)
+```
+
+Preparamos los datos.
+
+```{r}
+#| label: case-kmeans-data-prep
+
+# We have a couple of things we need to do to prepare the data.
+# The first is to convert the Gender feature to a factor.
+# The second is to convert the income feature to a number.
+# This requires that we remove both the USD and the "," in the data.
+mallcustomers <- mallcustomers %>%
+  mutate(Income = str_replace_all(Income," USD","")) %>%
+  mutate(Income = str_replace_all(Income,",","")) %>%
+  mutate(Income = as.numeric(Income))
+
+summary(mallcustomers)
+
+# We intend to segment based on Income and SpendingScore only.
+# So, we remove everything else and normalize our features.
+mallcustomers_scaled <- mallcustomers %>%
+  select(-CustomerID, -Gender, -Age) %>%
+  scale()
+
+# What does the data now look like?
+summary(mallcustomers_scaled)
+```
+
+Ahora, ejecutamos el algoritmo de *clustering*.
+
+```{r}
+#| label: fig-case-kmeans-clust
+#| fig-cap: ""
+
+# Elbow Method
+p1 <- fviz_nbclust(mallcustomers_scaled, kmeans, method = "wss") + geom_point(
+  shape = 1,
+  x = 6,
+  y = 60,
+  colour = "red",
+  size = 8,
+  stroke = 1.5
+) + ggtitle("Elbow Method")
+
+# Silhouette Method
+p2 <- fviz_nbclust(mallcustomers_scaled, kmeans, method = "silhouette") + geom_point(
+  shape = 1,
+  x = 6,
+  y = 0.53,
+  colour = "red",
+  size = 8,
+  stroke = 1.5
+) + ggtitle("Silhouette Method")
+
+# Gap Statistic
+p3 <- fviz_nbclust(mallcustomers_scaled, kmeans, method = "gap_stat") + geom_point(
+  shape = 1,
+  x = 6,
+  y = 0.57,
+  colour = "red",
+  size = 8,
+  stroke = 1.5
+) + ggtitle("Gap Statistic")
+
+grid.arrange(p1, p2, p3, nrow = 3)
+```
+
+Elegimos $k=6$. Ahora, repetimos el algoritmo con 25 configuraciones iniciales diferentes.
+
+```{r}
+#| label: fig-case-kmeans-kopt
+#| fig-cap: ""
+#| fig-height: 12
+#| fig-width: 15
+#| column: page-right
+
+# We set the value for k to 6 and choose to use 25 different initial configurations.
+set.seed(1234)
+k_clust <- kmeans(mallcustomers_scaled, centers = 6, nstart = 25)
+
+fviz_cluster(
+  k_clust,
+  data = mallcustomers_scaled,
+  main = "Mall Customers Segmented by Income and Spending Score",
+  repel = TRUE,
+  ggtheme = theme_minimal()
+) + theme(text = element_text(size = 14))
+```
 
 
-Ejemplo de reducc. dim.
+```{r}
+#| label: case-kmeans-eval
+
+# To further evaluate our results, we need to look at how attributes vary by cluster.
+mallcustomers %>%
+  mutate(cluster = k_clust$cluster) %>%
+  mutate(Male = ifelse(Gender == "Male", 1, 0)) %>%
+  mutate(Female = ifelse(Gender == "Female", 1, 0)) %>%
+  select(cluster, Male, Female, Age) %>%
+  group_by(cluster) %>%
+  summarise_all("mean")
+```
+
+```{r}
+
+mallcustomers_tagged <- mallcustomers |>
+  mutate(Cluster = as.factor(k_clust$cluster))
+head(mallcustomers_tagged)
+
+# Resumen estadístico por grupo
+resumen <- mallcustomers_tagged %>%
+  group_by(Cluster) %>%
+  summarise(
+    Cantidad = n(),
+    Edad_Promedio = mean(Age),
+    Ingreso_Promedio = mean(Income),
+    Spending_Promedio = mean(SpendingScore)
+  )
+
+print(resumen)
+```
+
+Ahora, podemos tratar de identificar algunos perfiles frecuentes de clientes:
+
+1. *Ahorradores*: ingresos altos, pero bajo `SpendingScore`.
+2. *Derrochadores*: ingresos bajos, pero alto `SpendingScore`.
+3. *Clientes *premium* *: ingresos altos y alto `SpendingScore` (este sería el grupo más valioso para los comerciantes).
+4. *Promedio*: ingresos medios y gasto medio.
+
+### Resolución con PAM (*k*-medoids)
+
+```{r}
+# 1. Cargar y limpiar datos
+datos <- read_csv("data/mallcustomers.csv")
+
+datos_limpios <- datos %>%
+  mutate(
+    Income = as.numeric(gsub("[^0-9]", "", Income)),
+    Gender = as.factor(Gender)
+  )
+
+# 2. Seleccionar y Escalar (Fundamental para PAM también)
+datos_num <- datos_limpios %>%
+  select(Age, Income, SpendingScore)
+
+datos_scaled <- scale(datos_num)
+```
+
+Selección del número óptimo de grupos.
+
+```{r}
+# Método de la Silueta para PAM
+fviz_nbclust(datos_scaled, cluster::pam, method = "silhouette") +
+  labs(subtitle = "Número óptimo de clusters para PAM (Silueta)")
+
+# Método del Codo (Elbow) para PAM
+fviz_nbclust(datos_scaled, cluster::pam, method = "wss") +
+  geom_vline(xintercept = 6, linetype = 2) +
+  labs(subtitle = "Número óptimo de clusters para PAM (Codo)")
+```
+
+```{r}
+set.seed(123)
+
+# Ejecutamos PAM con k=6
+# metric = "euclidean" es el estándar, pero PAM permite "manhattan" también.
+pam_res <- pam(datos_scaled, k = 6, metric = "euclidean")
+
+# Resumen básico
+print(pam_res)
+```
+
+```{r}
+#| label: fig-case-kmed-clust-groups
+#| fig-cap: ""
+
+fviz_cluster(pam_res, 
+             data = datos_scaled,
+             palette = "jco",
+             ellipse.type = "t", # 't' asume distribución t (menos estricto que convex)
+             repel = TRUE,       # Evita solapamiento de texto
+             ggtheme = theme_classic(),
+             main = "Clustering con PAM (K-Medoids)"
+)
+```
+
+Evaluación de la calidad del agrupamiento mediante el gráfico de Silueta.
+
+```{r}
+
+# Visualización detallada de la Silueta
+grafico_silueta <- fviz_silhouette(pam_res, palette = "jco", print.summary = FALSE)
+
+# Mostrar el gráfico
+print(grafico_silueta)
+```
+
+En la gráfica, cada barra horizontal representa a un cliente. Las barras están ordenadas por *cluster*
+(agrupamiento), mientras que la línea roja punteada señala el valor del promedio global. Si la mayoría
+de barras superan esta línea, entonces el *clustering* se considera robusto.
+
+¿Cuáles serían los clientes potencialmente mal clasificados?
+
+```{r}
+# 1. Calcular los valores de silueta individuales
+sil_values <- silhouette(pam_res$cluster, dist(datos_scaled))
+
+# 2. Identificar índices con silueta negativa (mal clasificados)
+indices_negativos <- which(sil_values[, "sil_width"] < 0)
+
+# 3. Mostrar quiénes son esos clientes en el dataset original
+# (Si no hay resultados, ¡felicidades! tu clustering es muy limpio)
+clientes_problematicos <- datos_limpios[indices_negativos, ]
+
+print("Clientes con silueta negativa (posibles outliers):")
+print(clientes_problematicos)
+
+# 4. Ver a qué cluster fueron asignados vs a cuál deberían ir (vecino más cercano)
+info_negativos <- data.frame(
+  ClienteID = indices_negativos,
+  Cluster_Asignado = sil_values[indices_negativos, "cluster"],
+  Vecino_Cercano = sil_values[indices_negativos, "neighbor"], # El cluster al que "quieren" ir
+  Valor_Silueta = sil_values[indices_negativos, "sil_width"]
+)
+
+print(info_negativos)
+```
+
+Por último, el valor promedio de la anchura de la silueta nos indica, globalmente, si los grupos
+están separados (valor cercano a 1) o los datos no están agrupados de forma natural (valores cercanos a 0).
+
+```{r}
+summary(sil_values)$avg.width
+```
+
+Interpretación de los medoides (clientes prototipo).
+
+```{r}
+# Extraemos los clientes reales que son los centros de cada grupo
+medoides_reales <- datos_limpios[pam_res$id.med, ]
+
+# Añadimos a qué cluster representan
+medoides_reales$Cluster_Representado <- 1:6
+
+print("Los 'Clientes Arquetipo' (Medoides) de cada grupo son:")
+print(medoides_reales)
+```
+
+## Ejemplo de reducc. dim.
 
 
-Ejemplo de autocodif?
+## Ejemplo de autocodif?
