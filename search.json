@@ -88,12 +88,12 @@
   {
     "objectID": "05-mapas-auto-org.html",
     "href": "05-mapas-auto-org.html",
-    "title": "5  Clustering jerárquico",
+    "title": "5  Mapas auto-organizados",
     "section": "",
     "text": "Ejemplos de algoritmos de cada clase",
     "crumbs": [
       "Clustering",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Clustering jerárquico</span>"
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Mapas auto-organizados</span>"
     ]
   },
   {
@@ -154,11 +154,11 @@
   {
     "objectID": "09-add-resources.html",
     "href": "09-add-resources.html",
-    "title": "9  Aplicaciones",
+    "title": "9  Recursos adicionales",
     "section": "",
-    "text": "Ejemplo de clustering\nEjemplo de reducc. dim.\nEjemplo de autocodif?",
+    "text": "La principal referencia práctica sobre implementación de modelos de aprendizaje máquina en R sigue siendo (boehmke2019?), tal y como hemos visto en todo este taller.\n\nLibro completo publicado en abierto.\n\nEl propio B. Boehmke mantiene un estupendo listado de recursos de aprendizaje para Ciencia de Datos. El listado de referencias sobre aprendizaje máquina es muy extenso, aunque incluye contenidos tanto en Python como en R y otros lenguajes.\nDespués de su segunda edición, An Introduction to Statistical Learning continúa siendo una de las referencias más sólidas, accesibles y completas para comprender los fundamentos de aprendizaje estadístico en los que se basan muchos de estos modelos/algoritmos, desde ese punto de vista. Como nota adicional, recalcar que el mismo libro está ahora disponible tanto en su versión para R como en otra versión para Python, lo que incrementa aún más si cabe su valor.\nPor último, Machine Learning with R (4th ed.) es otro clásico que se sigue renovando para incorporar las últimas tendencias, y también incluye numerosos ejemplos que ilustran diferentes algoritmos y métodos de ajuste y evaluación.",
     "crumbs": [
-      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Aplicaciones</span>"
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Recursos adicionales</span>"
     ]
   },
   {
