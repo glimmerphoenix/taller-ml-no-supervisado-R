@@ -126,13 +126,13 @@ grandes grupos, cuyo enfoque conceptual se ilustra en la @fig-types-clustering.
 
 ![Ilustración de los dos posibles tipos de algoritmos de clustering: (izq.) jerárquico; (dcha.) no jerárquico o partitivo. Fuente: Figura 12.2 de [@nwanganga2020].](img/types-clustering.png){#fig-types-clustering width="95%"}
 
-- **Clustering jerárquico**: En este enfoque, el algoritmo genera grupos de elementos que están
+- **Clustering jerárquico**: en este enfoque, el algoritmo genera grupos de elementos que están
 contenidos unos dentro de los otros. Por lo tanto, los límites de un
 agrupamiento pueden estar dentro de los límites de otra agrupación de mayor nivel, creando una jerarquía
 de relaciones padre-hijo entre los *clústeres*. Esta relación se suele representar gráficamente por medio de
 un diagrama de árbol que se denomina **dendograma**.
 
-- **Clustering no jerárquico** (*partitional*): La estrategia de este tipo de algoritmos consiste en particionar
+- **Clustering no jerárquico** (*partitional*): la estrategia de este tipo de algoritmos consiste en particionar
 el espacio de representación de un cierto número de grupos, siendo uno de los objetivos conseguir que no exista
 solape entre los grupos identificados y, por tanto, cada grupo es independiente del resto.
 
