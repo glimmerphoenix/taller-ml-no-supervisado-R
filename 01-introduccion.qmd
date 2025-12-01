@@ -55,5 +55,123 @@ un aviso de choque recibe una penalización para indicarle que lo ha hecho mal.
 
 ### Clustering
 
+El agrupamiento o *clustering* es una tarea que tiene por objetivo agrupar los datos en función del grado
+de **similaridad** (semejanza) que existe entre los elementos de un *dataset*. Por lo tanto, lo primero
+que debemos hacer es definir qué es una función de similaridad y su relación con la función de
+distancia.
+
+Consideremos un conjunto $\mathcal{X}$ de $n$ elementos, descritos por una serie de $d$ variables,
+$\{x_1, x_2,\dots, x_d \}$. Suponiendo que todas esas variables se pueden expresar mediante valores
+numéricos reales, cada elemento del conjunto $\mathcal{X}$ quedaría pues representado en un espacio $\mathbb{R}^d$.
+Una **función de similaridad** es una aplicación $S: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$
+que cumple estas propiedades:
+
+- *Normalizada*: $0 \leq S(A,B) \leq 1,\; \forall A,B$.
+- *Identidad*: $S(A,B) = 1 \Leftrightarrow $ A y B son iguales.
+- *Simetría*: $S(A,B) = S(B,A)$.
+
+Por tanto, la similaridad cuantifica cómo de parecidos son dos elementos de un conjunto de datos, según
+los valores de las variables que los describen. Existen definiciones análogas para determinar las propiedades
+de una función de similaridad con otros tipos de variables (por ejemplo, categóricas u ordinales). La 
+noción opuesta a la expresada por la **similaridad** es la **disimilaridad**, que cuantifica lo alejados o
+diferentes que son dos elementos de $\mathcal{X}$ entre sí. Es sencillo obtener una función de disimilaridad
+a partir de la función de similaridad, puesto que está normalizada.
+
+Si denotamos la **función de disimilaridad** como $\delta(A,B)$ esta se puede obtener como:
+
+$$
+\delta(A,B) = 1 - S(A,B).
+$$
+
+Una **función de distancia**, que podemos denotar como $D(A,B)$ mide también lo distintos que son 
+entre sí una pareja de elementos $(A,B)$ de $\mathcal{X}$. En el caso de las **distancias métricas**,
+éstas cumplen cuatro propiedades de los espacios métricos [@skopal2007]:
+
+- *Reflexividad*: $D(A,B) = 0 \Leftrightarrow A = B$.
+- *No negatividad*: $D(A,B) > 0 \Leftrightarrow A \neq B$.
+- *Simetría*: $D(A,B) = D(B,A)$.
+- *Desigualdad triangular*: $D(A,B) + D(B,C) \geq D(A,C)$.
+
+::: {.callout-info}
+## Distancias no métricas
+
+Aunque es muy habitual utilizar distancias *métricas* en los problemas de *clustering* y de búsqueda 
+por similaridad, también existen muchas funciones de distancia de gran utilidad en muchos problemas que
+no cumplen las cuatro propiedades enunciadas [@skopal2007]. Por ejemplo, las *semimétricas* son distancias
+que no cumplen la cuarta propiedad de desigualdad triangular. Por otro lado, las *pseudométricas* no
+satisfacen la reflexividad. Por último, las *cuasimétricas* no satisfacen la simetría.
+:::
+
+En lo sucesivo, vamos a circunscribir nuestra descripción a las distancias *métricas*, puesto que se
+utilizan en un gran número de problemas prácticos y simplificarán muchas consideraciones que haremos respecto
+de los algoritmos de *clustering* que vamos a tratar. Por ejemplo, una familia de distancias ampliamente
+conocida es la representada por la **distancia Minkowski** de *orden* $p > 0$, que se define como:
+
+$$
+D(A,B) = \left( \sum_{j=1}^d |x_{Aj}-x_{Bj}|^p \right)^{1/p},
+$$ {#eq-mink-dist}
+
+siendo $\|A\|_p = \left( \sum_{j=1}^d |x_{Aj}|^p \right)^{1/p}$ la *norma* $p* (denotada muchas veces como
+$L_p$) del vector A. Así, para $p=1$ tenemos la *distancia Manhattan*, mientras que para $p=2$ tenemos
+la popular *distancia Euclídea*.
+
+#### Tipos de clustering
+
+En general, las estrategias de aprendizaje no supervisado para clustering se pueden clasificar en dos
+grandes grupos, cuyo enfoque conceptual se ilustra en la @fig-types-clustering.
+
+![Ilustración de los dos posibles tipos de algoritmos de clustering: (izq.) jerárquico; (dcha.) no jerárquico o partitivo. Fuente: Figura 12.2 de [@nwanganga2020].](img/types-clustering.png){#fig-types-clustering width="95%"}
+
+- **Clustering jerárquico**: En este enfoque, el algoritmo genera grupos de elementos que están
+contenidos unos dentro de los otros. Por lo tanto, los límites de un
+agrupamiento pueden estar dentro de los límites de otra agrupación de mayor nivel, creando una jerarquía
+de relaciones padre-hijo entre los *clústeres*. Esta relación se suele representar gráficamente por medio de
+un diagrama de árbol que se denomina **dendograma**.
+
+- **Clustering no jerárquico** (*partitional*): La estrategia de este tipo de algoritmos consiste en particionar
+el espacio de representación de un cierto número de grupos, siendo uno de los objetivos conseguir que no exista
+solape entre los grupos identificados y, por tanto, cada grupo es independiente del resto.
+
+Por ejemplo, la @fig-voronoi-tess muestra las regiones determinadas por un algoritmo no jerárquico como
+*k*-means cuando divide el espacio de representación (asumimos que bidimensional) en varias regiones, asignando
+un punto representativo o *centroide* a cada región.
+
+![Ilustración de un diagrama o *tesela* de Voronoi, usando la distancia Euclídea. Fuente: Wikipedia.](img/Euclidean_Voronoi_diagram.svg.png){#fig-voronoi-tess width="60%"}
+
+Por último, tenemos otra taxonomía de algoritmos de *clustering* en función de si los agrupamientos pueden
+o no tener solapes entre sí, como muestra la @fig-types-clustering-overlap.
+
+![Ilustración de dos posibles tipos de algoritmos de clustering: (izq.) con solape entre grupos; (dcha.) sin solape entre grupos. Fuente: Figura 12.3 de [@nwanganga2020].](img/types-clustering-overlapping.png){#fig-types-clustering-overlap width="95%"}
 
 ### Reducción de dimensionalidad
+
+Otra tarea muy habitual en el aprendizaje automático no supervisado es la de expresar un conjunto de datos
+de manera más eficiente, reduciendo el número de variables que se emplean para describir sus elementos.
+Para ello, se busca identificar un conjunto más pequeño de variables, que se suelen denominar
+*componentes principales* o *variables latentes*. Estas nuevas variables deben ser capaces de capturar
+la misma cantidad de información sobre los elementos de nuestro conjunto de datos pero en un espacio
+de representación con muchas menos dimensiones.
+
+Consideremos el [dataset MNIST](https://es.wikipedia.org/wiki/Base_de_datos_MNIST), que contiene
+60.000 imágenes de entrenamiento y 10.000 imágenes de prueba, cada una de ellas con información sobre
+imágenes de dígitos manuscritos sobre una malla de 28x28 píxeles. Por tanto, cada elemento de este
+dataset está representado por 784 variables (una por cada pixel). La @fig-mnist-digits muestra algunos
+ejemplos de estas cifras manuscritas incluidas en el *dataset*.
+
+![Ejemplos de algunos de los dígitos manuscritos incluidos en el dataset MNIST.](img/MNIST-digits.png){#fig-mnist-digits width="95%"}
+
+Sería muy complicado conseguir
+la representación gráfica de todos estos elementos para detectar las imágenes de dígitos que son
+parecidas entre sí (por ejemplo, un grupo con los números `4`, otro con los números `8`, etc.). Las
+técnicas de reducción de dimensionalidad nos permiten proyectar la representación original de estos
+datos en un espacio $\mathbb{R}^784$ sobre un espacio $\mathbb{R}^2$, que sí podemos representar
+gráficamente.
+
+Por ejemplo, la @fig-mnist-tsne muestra una representación gráfica en 2D de una muestra aleatoria de
+elementos de MNIST, en la que previamente se han reducido las 784 dimensiones originales a 2 mediante
+el algoritmo t-SNE [@maaten2008visualizing].
+
+![Representación gráfica de la proyección 2D de una muestra de elementos del conjunto de datos MNIST, obtenida mediante el algoritmo t-SNE [@maaten2008visualizing]. Fuente: elaboración propia.](img/MNIST-tSNE.png){#fig-mnist-tsne width="95%"}
+
+Veremos que una limitación importante de estos algoritmos consiste en que las variables que obtenemos
+tras la reducción de las dimensiones originales no son, en muchos casos, fácilmente interpretables.
