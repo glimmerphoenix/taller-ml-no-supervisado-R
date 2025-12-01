@@ -63,12 +63,12 @@ distancia.
 Consideremos un conjunto $\mathcal{X}$ de $n$ elementos, descritos por una serie de $d$ variables,
 $\{x_1, x_2,\dots, x_d \}$. Suponiendo que todas esas variables se pueden expresar mediante valores
 numéricos reales, cada elemento del conjunto $\mathcal{X}$ quedaría pues representado en un espacio $\mathbb{R}^d$.
-Una **función de similaridad** es una aplicación $S: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$
+Una **función de similaridad** es una aplicación $s: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$
 que cumple estas propiedades:
 
-- *Normalizada*: $0 \leq S(A,B) \leq 1,\; \forall A,B$.
-- *Identidad*: $S(A,B) = 1 \Leftrightarrow $ A y B son iguales.
-- *Simetría*: $S(A,B) = S(B,A)$.
+- *Normalizada*: $0 \leq s(A,B) \leq 1,\; \forall A,B$.
+- *Identidad*: $s(A,B) = 1 \Leftrightarrow $ A y B son iguales.
+- *Simetría*: $s(A,B) = s(B,A)$.
 
 Por tanto, la similaridad cuantifica cómo de parecidos son dos elementos de un conjunto de datos, según
 los valores de las variables que los describen. Existen definiciones análogas para determinar las propiedades
@@ -83,14 +83,14 @@ $$
 \delta(A,B) = 1 - S(A,B).
 $$
 
-Una **función de distancia**, que podemos denotar como $D(A,B)$ mide también lo distintos que son 
+Una **función de distancia**, que podemos denotar como $DdA,B)$ mide también lo distintos que son 
 entre sí una pareja de elementos $(A,B)$ de $\mathcal{X}$. En el caso de las **distancias métricas**,
 éstas cumplen cuatro propiedades de los espacios métricos [@skopal2007]:
 
-- *Reflexividad*: $D(A,B) = 0 \Leftrightarrow A = B$.
-- *No negatividad*: $D(A,B) > 0 \Leftrightarrow A \neq B$.
-- *Simetría*: $D(A,B) = D(B,A)$.
-- *Desigualdad triangular*: $D(A,B) + D(B,C) \geq D(A,C)$.
+- *Reflexividad*: $d(A,B) = 0 \Leftrightarrow A = B$.
+- *No negatividad*: $d(A,B) > 0 \Leftrightarrow A \neq B$.
+- *Simetría*: $d(A,B) = D(B,A)$.
+- *Desigualdad triangular*: $d(A,B) + d(B,C) \geq d(A,C)$.
 
 ::: {.callout-info}
 ## Distancias no métricas
@@ -108,12 +108,16 @@ de los algoritmos de *clustering* que vamos a tratar. Por ejemplo, una familia d
 conocida es la representada por la **distancia Minkowski** de *orden* $p > 0$, que se define como:
 
 $$
-D(A,B) = \left( \sum_{j=1}^d |x_{Aj}-x_{Bj}|^p \right)^{1/p},
+d_{Mink}(A,B) = \left( \sum_{j=1}^d |x_{Aj}-x_{Bj}|^p \right)^{1/p},
 $$ {#eq-mink-dist}
 
 siendo $\|A\|_p = \left( \sum_{j=1}^d |x_{Aj}|^p \right)^{1/p}$ la *norma* $p* (denotada muchas veces como
-$L_p$) del vector A. Así, para $p=1$ tenemos la *distancia Manhattan*, mientras que para $p=2$ tenemos
-la popular *distancia Euclídea*.
+$L_p$) del vector A. Así, para $p=1$ tenemos la *distancia Manhattan* ($L_1$), mientras que para $p=2$ tenemos
+la popular *distancia Euclídea* ($L_2$).
+
+Se denomina **matriz de distancias** a una matriz $D=(d_{E_{i}E_{j}});\, i,j=1,\dots,n$ que contiene todas las
+distancias entre cada par de elementos $(E_i,E_j)$ de $\mathcal{X}$. Siempre que la función de distancia
+utilizada cumpla la propiedad de *simetría*, esta matriz será *triangular*.
 
 #### Tipos de clustering
 
