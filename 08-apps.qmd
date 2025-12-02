@@ -1,6 +1,5 @@
 # Aplicaciones
 
-
 ## Segmentación de clientes de un centro comercial
 
 En este caso de estudio, se analizan 200 observaciones correspondientes a clientes
@@ -277,5 +276,3 @@ print(medoides_reales)
 
 ## Ejemplo de reducc. dim.
 
-
-## Ejemplo de autocodif?
