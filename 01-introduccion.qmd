@@ -64,7 +64,7 @@ Consideremos un conjunto $\mathcal{X}$ de $n$ elementos, descritos por una serie
 $\{x_1, x_2,\dots, x_d \}$. Suponiendo que todas esas variables se pueden expresar mediante valores
 numéricos reales, cada elemento del conjunto $\mathcal{X}$ quedaría pues representado en un espacio $\mathbb{R}^d$.
 Una **función de similaridad** es una aplicación $s: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$
-que cumple estas propiedades para tres elementos $A, B y C$ de $\mathcal{X}$ [@xu2009clustering]:
+que cumple estas propiedades para tres elementos $A, B$ y $C$ de $\mathcal{X}$ [@xu2009clustering]:
 
 1. *Positividad*: $0 \leq s(A,B) \leq 1,\; \forall A,B$.
 2. *Simetría*: $s(A,B) = s(B,A)$.
@@ -124,6 +124,23 @@ no cumplen las cuatro propiedades enunciadas [@skopal2007]. Por ejemplo, las *se
 que no cumplen la cuarta propiedad de desigualdad triangular. Por otro lado, las *pseudométricas* no
 satisfacen la reflexividad. Por último, las *cuasimétricas* no satisfacen la simetría.
 :::
+
+#### Algunas funciones de distancia
+
+La @tbl-distance-funcs resume información básica sobre algunas funciones de distancia comúnmente empleadas.
+
+| Función distancia               | Es métrica      |   Aplicaciones                                   |
+|:--------------------------------|:---------------:|:-------------------------------------------------|
+| Manhattan (*city block*)        | Sí              | Multiples: análisis de imagen, tiempos de viaje  |
+| Euclídea                        | Sí              | Una de las funciones más utilizadas              |
+| Minkowski                       | Sí, $p\geq1$    | Generalización de funciones de disancia básicas  |
+| Mahalanobis                     | Sí              | Comparación entre distribuciones de valores      |
+| Similaridad del coseno          | No(*)           | Agrupamiento y comparación de documentos         |
+| Jaccard                         | Sí              | Datos binarios en ecología, genómica, etc.       |
+
+: Algunas funciones de distancia muy frecuentes. {#tbl-distance-funcs}
+
+(*): Se puede efectuar una trasnformación a una distancia "comparable" que sí cumple las propiedades de métrica.
 
 #### Tipos de clustering
 
