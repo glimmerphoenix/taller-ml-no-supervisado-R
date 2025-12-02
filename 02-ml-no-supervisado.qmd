@@ -1,3 +1,157 @@
 # Aprendizaje máquina no supervisado {#sec-unsupervised-ml}
 
-Ejemplos de algoritmos de cada clase
+## Clustering
+
+El análisis *cluster* (agrupamiento) identifica grupos de objetos basándose únicamente en la
+información que proporcionan los datos que describen esos objetos y sus relaciones entre sí.
+El **objetivo** es que los objetos asignados al mismo grupo se similares o estén relacionados
+entre sí y, a su vez, sean distintos (o no estén relacionados) con los elementos en otros
+grupos. En consecuencia, cuanto mayor sea la **homogeneidad** dentro de un mismo grupo y
+mayor sea la diferencia entre grupos, mejor o más distintivo será el *clustering*
+[@tan2019].
+
+Sin embargo, identificar los posibles agrupamientos en un conjunto de datos no es tan sencillo 
+como puede parecer a primera vista. La @fig-four-clusters muestra un conjunto de tan sólo 20 elementos
+en el que podemos formar, al menos, tres posibles agrupamientos de 2, 4 y 6 grupos, respectivamente.
+¿Cuál es la mejor opción? En muchos casos, no sólo depende de las métricas de evaluación que utilicemos,
+sino también de las descripciones disponibles sobre los datos y del conocimiento del dominio de
+aplicación del problema.
+
+![Un conjunto de 20 elmentos y cuatro posibles agrupamientos, con distinto número de grupos en cada caso. Basado en la Fig. 5.1 de [@tan2019].](img/four-clusters.png){#fig-four-clusters width="95%"}
+
+Existen diferentes tipos de algoritmos de agrupamiento o *clustering*, en función de las propiedades
+de los grupos que obtenemos como resultado del proceso.
+
+- **Clústering jerárquico** (o anidado): en este caso el resultado son agrupamientos anidados, unos
+dentro de los otros, que conforman una jerarquía de grupos. Según la estrategia empleada para crear
+los grupos, pueden ser:
+  - *Aglomerativos*: se parte de un primer grupo de datos, y se van uniendo progresivamente los siguientes
+  grupos de datos más similares, hasta que todos los datos quedan en un único grupo a alto nivel.
+  Normalmente, este algoritmo recibe el nombre de AGNES (AGlomerative NESting) [@boehmke2019]. Es mejor
+  detectando grupos de pequeño tamaño, con pocos elementos.
+  - *Divisivos*: se comienza considerando a todos los datos dentro de un mismo grupo, y progresivamente
+  se van dividiendo en grupos anidados, de modo que los elementos más cercanos queden en el mismo grupo.
+  Este algoritmo se denomina con frecuencia DIANA (DIvise ANAlysis). Es más adecuado para detectar grupos
+  de gran tamaño, con muchos elementos.
+- **Clústering partitivo (no jerárquico)**: propone una división sin solape entre los grupos de elementos,
+de forma que cada grupo contenga elementos parecidos entre sí. Lo normal es que sigan un procedimiento
+iterativo para resolver el problema, cuya solución exacta no se puede hallar computacionalmente.
+
+En función de si existe o no solape entre los grupos tenemos:
+
+- **Clustering sin solape**: es el tipo de clustering propuesto por los algoritmos partitivos. También hay
+que considerar el clustering jerárquico como sin solape, puesto que la relación entre agrupamientos anidados
+se produce a distintos niveles (no es lo mismo un solape entre dos grupos al mismo nivel que el hecho de que
+un grupo esté contenido en otro de mayor nivel jerárquico).
+- **Clustering con solape** (no exclusivo): permite que un elemento pueda pertenecer a más de un grupo
+a la vez. Es decir, pueden existir solapes entre las regiones definidas para cada grupo.
+- **Clustering difuso** (*fuzzy clustering*): todo objeto pertenece a todos los agrupamientos con un cierto
+grado (peso) de pertenencia entre 0 (no pertenece en absoluto) y 1 (pertenece con toda seguridad).
+Usualmente, se impone la condición adicional de que la suma de los pesos asignados a un elemento sea 1.
+En el *clustering probabilístico* los pesos asignados son probabilidades de pertenencia a un grupo.
+Lo normal es que este tipo de técnicas produzcan agrupamientos *exclusivos*, asignando cada elemento al
+grupo que tenga el peso o probabilidad de pertenencia más alta.
+
+Por último, se puede tratar todo el dataset o sólo una parte:
+
+- **Clustering completo**: todos los elementos deben pertenecer, al menos, a un grupo.
+- **Clustering parcial**: algunos elementos pueden no pertenecer a ningún grupo. La motivación de este
+tipo de soluciones es que pueden existir elementos de nuestro conjunto de datos que no pertenezcan a grupos
+bien definidos, se consideren ruido o sean atípicos que no proporcionan información (pero mucho cuidado con fallar
+en esa interpretación) [@tan2019].
+
+Por último, para generar los agrupamientos los algoritmos pueden fijarse en diferentes *propiedades*
+o características de los datos. Si buscamos agrupamientos **bien separados**, se procurará agrupar elementos
+cercanos entre sí y separados de los elementos en otros grupos. Los algoritmos **basados en prototipos**
+asignan los elementos a un agrupamiento en función de su distancia al *prototipo* (elemento representativo)
+de ese agrupamiento. Con frecuencia se denomian *clusters basados en centros*. Las estrategias **basadas
+en grafos** agrupan elementos en función de su grado de conexión en una red. Los métodos **basados en densidad**
+agrupan regiones con gran densidad de objetos contiguos los unos a los otros, separadas por otras regiones
+menos densas a su alrededor. Se emplean usualmente con grupos de formas irregulares o entrecruzados, cuando
+hay presencia de ruido y valores atípicos [@tan2019]. Por último, en los **métodos conceptuales** se agrupan
+elementos que compartan propiedades comunes.
+
+### Clustering no jerárquico
+
+#### *k*-means
+
+Es un algoritmo de *clustering* **particionado**, basado en **prototipos**. El número total de grupos a
+identificar, denotado por $k$, debe ser *definido por el usuario*. Cada grupo está representado por un
+**centroide**, que es un elemento *ficticio* (no un elemento real del dataset), que representa el punto
+de referencia o representativo de todos los elementos incluidos en su grupo.
+
+La @fig-kmeans-clust muestra gráficamente el proceso iterativo de definición de los agrupamientos hasta
+llegar a una solución convergente (pero que puede no ser óptima). Se trata de un problema NP-hard, que
+debe resolverse mediante heurísticos aproximados que no garantizan la mejor solución, aunque se pueden
+tomar medidas para encontrar buenos agrupamientos.
+
+![Proceso iterativo para definir los agrupamientos en el algoritmo *k*-means. Fuente: Wikipedia](img/K-means-convergence.gif){#fig-kmeans-clust width="70%"}
+
+#### *k*-medoids
+
+Es un algoritmo clásico de particionado que divide el conjunto de datos en $k$ grupos. Nuevamente, este
+valor $k$ debe ser *definido por el usuario*. A diferencia del método anterior, este algoritmo identifica
+un elemento *real* de los datos como el *prototipo* o representante de los elementos incluidos en su grupo.
+Esto facilita mucho la interpretación de los resultados. El nombre del algoritmo fue popularizado por
+L. Kaufman y P.J. Rousseeuw con su algoritmo PAM (*Partitioning Around Medoids*).
+
+La @fig-kmedoids-clust muestra visualmente el proceso iterativo para encontrar los agrupamientos.
+
+![Proceso iterativo para definir los agrupamientos en el algoritmo *k*-medoids. Fuente: Wikipedia](img/K-Medoids-Clustering.gif){#fig-kmedoids-clust width="70%"}
+
+#### DBSCAN
+
+DBSCAN (*Density-Based Spatial Clustering of Applications with Noise*) es un algoritmo de agrupamiento 
+basado en la densidad. A diferencia de métodos como *k*-means, que asumen que los clústeres 
+quedan definidos por regiones de Voronoi basadas en la función de distancia (típicamente hiperesferas con distancia
+Euclídea), DBSCAN define los clústeres como regiones continuas de alta densidad de puntos, separadas 
+por regiones de baja densidad.
+
+Su funcionamiento se rige por dos parámetros globales:
+
+- $\varepsilon$: define el radio de vecindad alrededor de cada punto.
+- $minPts$: mínimo número de puntos que deben caer dentro del radio de vecindad $\varepsilon$ para que esa
+región se considere *densa*.
+
+En base a estos parámetros, el algoritmo clasifica los elementos del dataset en tres posibles categorías:
+
+1. Punto Núcleo (*Core Point*): un punto $p$ es un núcleo si su vecindad $\varepsilon$ contiene al menos $minPts$
+elementos (incluyéndose a sí mismo).
+2. Punto Frontera (*Border Point*): un punto $q$ es frontera si es alcanzable desde un punto núcleo 
+(está dentro de su distancia $\varepsilon$), pero tiene menos de $minPts$ en su propia vecindad.
+3. Ruido (*Noise/Outlier*): un punto es ruido si no es ni núcleo ni frontera.
+
+A diferencia de los dos ejemplos anteriores, DBSCAN no requiere especificar $k$, sino que el algoritmo
+puede determinar el número de agrupamientos según la densidad de los datos. Es especialmente propicio para
+detectar grupos con formas geométricas "complejas" (no convexas), como el "swiss roll", arcos, anillos o
+zig-zags. Además, su diseño está pensado para detectar y filtrar los elementos que se consideren "ruido".
+Se utiliza con frecuencia en bases de datos espaciales. No obstante, también tiene limitaciones, ya que
+puede tener dificultades en datasets con densidad variable en diferentes regiones o con datasets representados
+en espacios de alta dimensionalidad.
+
+### Clustering jerárquico
+
+En el clustering jerárquico, los agrupamientos están anidados y pueden formar una estructura jerárquica, que
+se suele representar gráficamente en forma de un árbol llamado **dendograma**, como el que se presenta en la
+@fig-dendogram.
+
+![Ejemplo de un dendograma que representa los agrupamientos encontrados tras aplicar un algoritmo de *clustering* jerárquico. Fuente: Figura 21.1 de [@boehmke2019].](img/dendrogram.png){#fig-dendogram width="90%"}
+
+#### AGNES
+
+El método de *clustering* aglomerativo parte de un conjunto de $n$ grupos, uno por cada elemento de nuestro
+dataset. En cada iteración, une los dos grupos más similares hasta que se obtenga un único grupo que
+contiene a todos los datos.
+
+Para ello, se necesita establecer un criterio de "enlace" para fusionar los grupos, que determine la distancia
+entre dos agrupamientos. Se pueden usar varios criterios:
+
+- Agrupamiento de enlace completo: minimiza la distancia máxima entre las parejas de observaciones de dos
+agrupamientos.
+- Método de Ward: minimizar la suma de las diferencias cuadráticas dentro de los clusteres. De ese modo, se
+minimiza la varianza total del conglomerado.
+- Agrupamiento de enlace promedio: minimizar la media de las distancias entre las observaciones pertenecientes
+a dos clusteres (calculadas por pares).
+- Agrupamiento de enlace mínimo o simple: minimizar las distancias entre las observaciones más cercanas
+en dos clústers.
+- Enlace de centroides: se calcula la distancia entre el centroide del grupo A y el centroide del grupo B.
