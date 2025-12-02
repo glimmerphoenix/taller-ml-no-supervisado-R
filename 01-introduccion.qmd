@@ -64,11 +64,17 @@ Consideremos un conjunto $\mathcal{X}$ de $n$ elementos, descritos por una serie
 $\{x_1, x_2,\dots, x_d \}$. Suponiendo que todas esas variables se pueden expresar mediante valores
 numéricos reales, cada elemento del conjunto $\mathcal{X}$ quedaría pues representado en un espacio $\mathbb{R}^d$.
 Una **función de similaridad** es una aplicación $s: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$
-que cumple estas propiedades:
+que cumple estas propiedades para tres elementos $A, B y C$ de $\mathcal{X}$ [@xu2009clustering]:
 
-- *Normalizada*: $0 \leq s(A,B) \leq 1,\; \forall A,B$.
-- *Identidad*: $s(A,B) = 1 \Leftrightarrow $ A y B son iguales.
-- *Simetría*: $s(A,B) = s(B,A)$.
+1. *Positividad*: $0 \leq s(A,B) \leq 1,\; \forall A,B$.
+2. *Simetría*: $s(A,B) = s(B,A)$.
+
+Si además cumple las siguientes propiedades:
+
+3. $s(A,B)S(B,C) \leq \[S(A,B)+S(B,C)\]S(A,C)$;
+4. *Reflexividad*: $S(A,B)=1 \Leftrightarrow A=B$,
+
+entonces se denomina **métrica de similaridad**.
 
 Por tanto, la similaridad cuantifica cómo de parecidos son dos elementos de un conjunto de datos, según
 los valores de las variables que los describen. Existen definiciones análogas para determinar las propiedades
@@ -92,16 +98,6 @@ entre sí una pareja de elementos $(A,B)$ de $\mathcal{X}$. En el caso de las **
 - *Simetría*: $d(A,B) = D(B,A)$.
 - *Desigualdad triangular*: $d(A,B) + d(B,C) \geq d(A,C)$.
 
-::: {.callout-info}
-## Distancias no métricas
-
-Aunque es muy habitual utilizar distancias *métricas* en los problemas de *clustering* y de búsqueda 
-por similaridad, también existen muchas funciones de distancia de gran utilidad en muchos problemas que
-no cumplen las cuatro propiedades enunciadas [@skopal2007]. Por ejemplo, las *semimétricas* son distancias
-que no cumplen la cuarta propiedad de desigualdad triangular. Por otro lado, las *pseudométricas* no
-satisfacen la reflexividad. Por último, las *cuasimétricas* no satisfacen la simetría.
-:::
-
 En lo sucesivo, vamos a circunscribir nuestra descripción a las distancias *métricas*, puesto que se
 utilizan en un gran número de problemas prácticos y simplificarán muchas consideraciones que haremos respecto
 de los algoritmos de *clustering* que vamos a tratar. Por ejemplo, una familia de distancias ampliamente
@@ -118,6 +114,16 @@ la popular *distancia Euclídea* ($L_2$).
 Se denomina **matriz de distancias** a una matriz $D=(d_{E_{i}E_{j}});\, i,j=1,\dots,n$ que contiene todas las
 distancias entre cada par de elementos $(E_i,E_j)$ de $\mathcal{X}$. Siempre que la función de distancia
 utilizada cumpla la propiedad de *simetría*, esta matriz será *triangular*.
+
+::: {.callout-note}
+## Distancias no métricas
+
+Aunque es muy habitual utilizar distancias *métricas* en los problemas de *clustering* y de búsqueda 
+por similaridad, también existen muchas funciones de distancia de gran utilidad en muchos problemas que
+no cumplen las cuatro propiedades enunciadas [@skopal2007]. Por ejemplo, las *semimétricas* son distancias
+que no cumplen la cuarta propiedad de desigualdad triangular. Por otro lado, las *pseudométricas* no
+satisfacen la reflexividad. Por último, las *cuasimétricas* no satisfacen la simetría.
+:::
 
 #### Tipos de clustering
 
