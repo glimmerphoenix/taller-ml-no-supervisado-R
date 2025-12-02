@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -251,8 +285,18 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#ejemplo-con-r" id="toc-ejemplo-con-r" class="nav-link active" data-scroll-target="#ejemplo-con-r"><span class="header-section-number">5.1</span> Ejemplo con R</a>
+  <ul class="collapse">
+  <li><a href="#creación-y-entrenamiento-del-som" id="toc-creación-y-entrenamiento-del-som" class="nav-link" data-scroll-target="#creación-y-entrenamiento-del-som"><span class="header-section-number">5.1.1</span> Creación y entrenamiento del SOM</a></li>
+  <li><a href="#representación-gráfica-de-los-resultados" id="toc-representación-gráfica-de-los-resultados" class="nav-link" data-scroll-target="#representación-gráfica-de-los-resultados"><span class="header-section-number">5.1.2</span> Representación gráfica de los resultados</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -277,8 +321,178 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>Ejemplos de algoritmos de cada clase</p>
+<section id="ejemplo-con-r" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="ejemplo-con-r"><span class="header-section-number">5.1</span> Ejemplo con R</h2>
+<p>El paquete <code>kohonen</code> implementa en R algoritmos SOM, incluyendo también herramientas para interrogar al mapa resultante y obtener predicciones.</p>
+<p>En el ejemplo, vamos a utilizar el dataset <code>nutrients.meat.fish.fowl.1959</code>, que está incluido en el paquete <code>cluster.datasets</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"kohonen"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"cluster.datasets"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"ggplot2"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>El conjunto de datos <code>nutrients.meat.fish.fowl.1959</code> contiene información nutricional (calorías, proteínas, grasas, calcio, hierro) de diferentes tipos de carne. Nuestro objetivo al aplicar un SOM será agrupar estas carnes en un mapa 2D, de tal forma que las carnes nutricionalmente similares queden cerca unas de otras.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Cargar el dataset</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"nutrients.meat.fish.fowl.1959"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> nutrients.meat.fish.fowl<span class="fl">.1959</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Miremos la estructura</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             name energy protein fat calcium iron
+1    Braised beef    340      20  28       9  2.6
+2       Hamburger    245      21  17       9  2.7
+3      Roast beef    420      15  39       7  2.0
+4       Beefsteak    375      19  32       9  2.6
+5     Canned beef    180      22  10      17  3.7
+6 Broiled chicken    115      20   3       8  1.4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Preprocesamiento</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># El nombre de la carne (columna 'name') no es un dato numérico para el cálculo,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># pero lo necesitamos para etiquetar el gráfico al final.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>nombres_carnes <span class="ot">&lt;-</span> df<span class="sc">$</span>name</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleccionamos solo las columnas numéricas (Nutrientes)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Según la estructura usual de este dataset, la columna 1 es el nombre.</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>data_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(df[, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Escalado (NORMALIZACIÓN) - ¡Paso Crítico!</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Los SOM funcionan con distancias. Si las Calorías son 300 y el Hierro es 2,</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># la variable Calorías dominará todo el mapa. Debemos escalar para que todas</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># las variables tengan el mismo peso.</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>data_scaled <span class="ot">&lt;-</span> <span class="fu">scale</span>(data_matrix)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="creación-y-entrenamiento-del-som" class="level3" data-number="5.1.1">
+<h3 data-number="5.1.1" class="anchored" data-anchor-id="creación-y-entrenamiento-del-som"><span class="header-section-number">5.1.1</span> Creación y entrenamiento del SOM</h3>
+<p>Ahora, definimos la rejilla (<em>grid</em>) en la que vamos a proyectar los datos. La mejor opción suele ser un mapa hexagonal.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># Para reproducibilidad</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Definir la rejilla (Grid)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Usaremos un mapa pequeño de 5x5 hexágonos (25 neuronas en total)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># dado que el dataset no es masivo.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>som_grid <span class="ot">&lt;-</span> <span class="fu">somgrid</span>(<span class="at">xdim =</span> <span class="dv">5</span>, <span class="at">ydim =</span> <span class="dv">5</span>, <span class="at">topo =</span> <span class="st">"hexagonal"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Entrenar el modelo</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># rlen: número de veces que el dataset completo se presenta a la red.</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>som_model <span class="ot">&lt;-</span> <span class="fu">som</span>(data_scaled, </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">grid =</span> som_grid, </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                 <span class="at">rlen =</span> <span class="dv">500</span>, </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                 <span class="at">alpha =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>), <span class="co"># Tasa de aprendizaje (inicio, fin)</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">keep.data =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Ver resumen del modelo</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(som_model)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SOM of size 5x5 with a hexagonal topology and a bubble neighbourhood function.
+The number of data layers is 1.
+Distance measure(s) used: sumofsquares.
+Training data included: 27 objects.
+Mean distance to the closest unit in the map: 0.306.</code></pre>
+</div>
+</div>
+</section>
+<section id="representación-gráfica-de-los-resultados" class="level3" data-number="5.1.2">
+<h3 data-number="5.1.2" class="anchored" data-anchor-id="representación-gráfica-de-los-resultados"><span class="header-section-number">5.1.2</span> Representación gráfica de los resultados</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(som_model, <span class="at">type =</span> <span class="st">"changes"</span>, <span class="at">main =</span> <span class="st">"Progreso del Entrenamiento"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-som-convergence" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-som-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05-mapas-auto-org_files/figure-html/fig-som-convergence-1.png" id="fig-som-convergence" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-som-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;5.1
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(som_model, <span class="at">type =</span> <span class="st">"counts"</span>, <span class="at">main =</span> <span class="st">"Densidad de Nodos (Número de carnes)"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-som-counts-map" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-som-counts-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05-mapas-auto-org_files/figure-html/fig-som-counts-map-1.png" id="fig-som-counts-map" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-som-counts-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;5.2
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(som_model, <span class="at">type =</span> <span class="st">"codes"</span>, <span class="at">main =</span> <span class="st">"Perfil Nutricional por Nodo"</span>, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">palette.name =</span> rainbow)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-som-codes-map" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-som-codes-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05-mapas-auto-org_files/figure-html/fig-som-codes-map-1.png" id="fig-som-codes-map" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-som-codes-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;5.3
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(som_model, <span class="at">type =</span> <span class="st">"dist.neighbours"</span>, <span class="at">main =</span> <span class="st">"U-Matrix (Distancia entre vecinos)"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-som-dist-map" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-som-dist-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05-mapas-auto-org_files/figure-html/fig-som-dist-map-1.png" id="fig-som-dist-map" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-som-dist-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;5.4
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Interpretación:</p>
+<ul>
+<li><p><strong>Colores oscuros</strong>: Distancia baja. Los nodos vecinos son muy similares.</p></li>
+<li><p><strong>Colores claros</strong>: Distancia alta (fronteras). Indican una separación fuerte entre grupos de datos (clusters naturales).</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Asignamos colores bonitos para los clusters</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Usamos clusters jerárquicos sobre los vectores de código del SOM</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># para definir 3 grandes grupos (ej: Carnes rojas, Pescados, Aves/Otras)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>som_cluster <span class="ot">&lt;-</span> <span class="fu">cutree</span>(<span class="fu">hclust</span>(<span class="fu">dist</span>(som_model<span class="sc">$</span>codes[[<span class="dv">1</span>]])), <span class="dv">3</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Paleta de colores para los 3 grupos</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>my_pal <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"blue"</span>, <span class="st">"green"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>bg_colors <span class="ot">&lt;-</span> my_pal[som_cluster]</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Graficamos el mapa final</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(som_model, <span class="at">type =</span> <span class="st">"mapping"</span>, <span class="at">pchs =</span> <span class="dv">21</span>, <span class="at">bg =</span> bg_colors, <span class="at">shape =</span> <span class="st">"straight"</span>, </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Mapa de Carnes (Clustering)"</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos el texto (nombres de las carnes) al mapa</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="fu">add.cluster.boundaries</span>(som_model, som_cluster)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-som-clusters" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-som-clusters-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05-mapas-auto-org_files/figure-html/fig-som-clusters-1.png" id="fig-som-clusters" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-som-clusters-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;5.5
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

@@ -20,7 +20,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -69,6 +89,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -251,8 +300,18 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#clustering" id="toc-clustering" class="nav-link active" data-scroll-target="#clustering"><span class="header-section-number">2.1</span> Clustering</a>
+  <ul class="collapse">
+  <li><a href="#clustering-no-jerárquico" id="toc-clustering-no-jerárquico" class="nav-link" data-scroll-target="#clustering-no-jerárquico"><span class="header-section-number">2.1.1</span> Clustering no jerárquico</a></li>
+  <li><a href="#clustering-jerárquico" id="toc-clustering-jerárquico" class="nav-link" data-scroll-target="#clustering-jerárquico"><span class="header-section-number">2.1.2</span> Clustering jerárquico</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -276,9 +335,165 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Ejemplos de algoritmos de cada clase</p>
+<section id="clustering" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="clustering"><span class="header-section-number">2.1</span> Clustering</h2>
+<p>El análisis <em>cluster</em> (agrupamiento) identifica grupos de objetos basándose únicamente en la información que proporcionan los datos que describen esos objetos y sus relaciones entre sí. El <strong>objetivo</strong> es que los objetos asignados al mismo grupo se similares o estén relacionados entre sí y, a su vez, sean distintos (o no estén relacionados) con los elementos en otros grupos. En consecuencia, cuanto mayor sea la <strong>homogeneidad</strong> dentro de un mismo grupo y mayor sea la diferencia entre grupos, mejor o más distintivo será el <em>clustering</em> <span class="citation" data-cites="tan2019">(<a href="references.html#ref-tan2019" role="doc-biblioref">Tan et&nbsp;al., 2019</a>)</span>.</p>
+<p>Sin embargo, identificar los posibles agrupamientos en un conjunto de datos no es tan sencillo como puede parecer a primera vista. La <a href="#fig-four-clusters" class="quarto-xref">Figura&nbsp;<span>2.1</span></a> muestra un conjunto de tan sólo 20 elementos en el que podemos formar, al menos, tres posibles agrupamientos de 2, 4 y 6 grupos, respectivamente. ¿Cuál es la mejor opción? En muchos casos, no sólo depende de las métricas de evaluación que utilicemos, sino también de las descripciones disponibles sobre los datos y del conocimiento del dominio de aplicación del problema.</p>
+<div id="fig-four-clusters" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-four-clusters-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/four-clusters.png" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-four-clusters-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;2.1: Un conjunto de 20 elmentos y cuatro posibles agrupamientos, con distinto número de grupos en cada caso. Basado en la Fig. 5.1 de <span class="citation" data-cites="tan2019">(<a href="references.html#ref-tan2019" role="doc-biblioref">Tan et&nbsp;al., 2019</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>Existen diferentes tipos de algoritmos de agrupamiento o <em>clustering</em>, en función de las propiedades de los grupos que obtenemos como resultado del proceso.</p>
+<ul>
+<li><strong>Clústering jerárquico</strong> (o anidado): en este caso el resultado son agrupamientos anidados, unos dentro de los otros, que conforman una jerarquía de grupos. Según la estrategia empleada para crear los grupos, pueden ser:
+<ul>
+<li><em>Aglomerativos</em>: se parte de un primer grupo de datos, y se van uniendo progresivamente los siguientes grupos de datos más similares, hasta que todos los datos quedan en un único grupo a alto nivel. Normalmente, este algoritmo recibe el nombre de AGNES (AGlomerative NESting) <span class="citation" data-cites="boehmke2019">(<a href="references.html#ref-boehmke2019" role="doc-biblioref">Boehmke &amp; Greenwell, 2019</a>)</span>. Es mejor detectando grupos de pequeño tamaño, con pocos elementos.</li>
+<li><em>Divisivos</em>: se comienza considerando a todos los datos dentro de un mismo grupo, y progresivamente se van dividiendo en grupos anidados, de modo que los elementos más cercanos queden en el mismo grupo. Este algoritmo se denomina con frecuencia DIANA (DIvise ANAlysis). Es más adecuado para detectar grupos de gran tamaño, con muchos elementos.</li>
+</ul></li>
+<li><strong>Clústering partitivo (no jerárquico)</strong>: propone una división sin solape entre los grupos de elementos, de forma que cada grupo contenga elementos parecidos entre sí. Lo normal es que sigan un procedimiento iterativo para resolver el problema, cuya solución exacta no se puede hallar computacionalmente.</li>
+</ul>
+<p>En función de si existe o no solape entre los grupos tenemos:</p>
+<ul>
+<li><strong>Clustering sin solape</strong>: es el tipo de clustering propuesto por los algoritmos partitivos. También hay que considerar el clustering jerárquico como sin solape, puesto que la relación entre agrupamientos anidados se produce a distintos niveles (no es lo mismo un solape entre dos grupos al mismo nivel que el hecho de que un grupo esté contenido en otro de mayor nivel jerárquico).</li>
+<li><strong>Clustering con solape</strong> (no exclusivo): permite que un elemento pueda pertenecer a más de un grupo a la vez. Es decir, pueden existir solapes entre las regiones definidas para cada grupo.</li>
+<li><strong>Clustering difuso</strong> (<em>fuzzy clustering</em>): todo objeto pertenece a todos los agrupamientos con un cierto grado (peso) de pertenencia entre 0 (no pertenece en absoluto) y 1 (pertenece con toda seguridad). Usualmente, se impone la condición adicional de que la suma de los pesos asignados a un elemento sea 1. En el <em>clustering probabilístico</em> los pesos asignados son probabilidades de pertenencia a un grupo. Lo normal es que este tipo de técnicas produzcan agrupamientos <em>exclusivos</em>, asignando cada elemento al grupo que tenga el peso o probabilidad de pertenencia más alta.</li>
+</ul>
+<p>Por último, se puede tratar todo el dataset o sólo una parte:</p>
+<ul>
+<li><strong>Clustering completo</strong>: todos los elementos deben pertenecer, al menos, a un grupo.</li>
+<li><strong>Clustering parcial</strong>: algunos elementos pueden no pertenecer a ningún grupo. La motivación de este tipo de soluciones es que pueden existir elementos de nuestro conjunto de datos que no pertenezcan a grupos bien definidos, se consideren ruido o sean atípicos que no proporcionan información (pero mucho cuidado con fallar en esa interpretación) <span class="citation" data-cites="tan2019">(<a href="references.html#ref-tan2019" role="doc-biblioref">Tan et&nbsp;al., 2019</a>)</span>.</li>
+</ul>
+<p>Por último, para generar los agrupamientos los algoritmos pueden fijarse en diferentes <em>propiedades</em> o características de los datos. Si buscamos agrupamientos <strong>bien separados</strong>, se procurará agrupar elementos cercanos entre sí y separados de los elementos en otros grupos. Los algoritmos <strong>basados en prototipos</strong> asignan los elementos a un agrupamiento en función de su distancia al <em>prototipo</em> (elemento representativo) de ese agrupamiento. Con frecuencia se denomian <em>clusters basados en centros</em>. Las estrategias <strong>basadas en grafos</strong> agrupan elementos en función de su grado de conexión en una red. Los métodos <strong>basados en densidad</strong> agrupan regiones con gran densidad de objetos contiguos los unos a los otros, separadas por otras regiones menos densas a su alrededor. Se emplean usualmente con grupos de formas irregulares o entrecruzados, cuando hay presencia de ruido y valores atípicos <span class="citation" data-cites="tan2019">(<a href="references.html#ref-tan2019" role="doc-biblioref">Tan et&nbsp;al., 2019</a>)</span>. Por último, en los <strong>métodos conceptuales</strong> se agrupan elementos que compartan propiedades comunes.</p>
+<section id="clustering-no-jerárquico" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="clustering-no-jerárquico"><span class="header-section-number">2.1.1</span> Clustering no jerárquico</h3>
+<section id="k-means" class="level4" data-number="2.1.1.1">
+<h4 data-number="2.1.1.1" class="anchored" data-anchor-id="k-means"><span class="header-section-number">2.1.1.1</span> <em>k</em>-means</h4>
+<p>Es un algoritmo de <em>clustering</em> <strong>particionado</strong>, basado en <strong>prototipos</strong>. El número total de grupos a identificar, denotado por <span class="math inline">\(k\)</span>, debe ser <em>definido por el usuario</em>. Cada grupo está representado por un <strong>centroide</strong>, que es un elemento <em>ficticio</em> (no un elemento real del dataset), que representa el punto de referencia o representativo de todos los elementos incluidos en su grupo.</p>
+<p>La <a href="#fig-kmeans-clust" class="quarto-xref">Figura&nbsp;<span>2.2</span></a> muestra gráficamente el proceso iterativo de definición de los agrupamientos hasta llegar a una solución convergente (pero que puede no ser óptima). Se trata de un problema NP-hard, que debe resolverse mediante heurísticos aproximados que no garantizan la mejor solución, aunque se pueden tomar medidas para encontrar buenos agrupamientos.</p>
+<div id="fig-kmeans-clust" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmeans-clust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/K-means-convergence.gif" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kmeans-clust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;2.2: Proceso iterativo para definir los agrupamientos en el algoritmo <em>k</em>-means. Fuente: Wikipedia
+</figcaption>
+</figure>
+</div>
+<p>Si denotamos como <span class="math inline">\(C_1, \dots, C_k\)</span> los conjuntos que contienen los índices de las observaciones que se asignan a cadad grupo, dichos conjuntos satisfacen dos propiedades:</p>
+<ol type="1">
+<li><span class="math inline">\(C_1 \cup C_2 \cup \dots \cup C_k = {1, \dots, n}\)</span>; es decir, cada observación pertenece al menos a uno de los conjuntos.</li>
+<li><span class="math inline">\(C_j \cap C_{j'} = \emptyset;\, \forall j \neq j'\)</span>, es decir, los clusters no tienen solape entre sí y ninguna observación pertenece a más de un cluster.</li>
+</ol>
+<p>El objetivo que persigue <em>k</em>-means es que la <em>variación intra-cluster</em> sea lo más pequeña posible. En inglés, esa <strong>within-cluster variation</strong> para el grupo <span class="math inline">\(C_j\)</span> es una medida <span class="math inline">\(W(C_j)\)</span> de la cantidad de diferencia que existe entre los elementos asignados a ese grupo. Por tanto, el objetivo es resolver el problema expresado por la <a href="#eq-k-means-obj" class="quarto-xref">Ecuación&nbsp;<span>2.1</span></a>:</p>
+<p><span id="eq-k-means-obj"><span class="math display">\[
+min_{C_1,\dots,C_k} \left\{ \sum_{j=1}^k W(C_j) \right\}
+\tag{2.1}\]</span></span></p>
+<p>En otras palabras, se pretende minimizar la suma en todos los grupos de la variación registrada dentro de cada grupo. Si utilizamos la distancia Euclídea, entonces W(C_k) se convierte en la función conocida como Within-Cluster Sum of Squares (WCSS).</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Otras métricas de distancia en <em>k</em>-means
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Debemos tener mucho cuidado con la utilzación del algoritmo <em>k</em>-means si queremos emplear otras funciones métricas de distancia distintas de la distancia Euclídea (norma <span class="math inline">\(L_2\)</span>). La mayoría de paquetes y bibliotecas software <strong>asumen por defecto</strong> que se va a utilizar dicha distancia, ya que la función objetivo que se plantea en el problema de optimización que debe resolver es, precisamente, minimizar el WCSS. Como acabamos de ver arriba, este criterio *sólo es valido para la distancia Euclídea**. Existen algunas implementaciones del algoritmo con otras funciones de distancia, pero no son para nada habituales.</p>
+</div>
+</div>
+</section>
+<section id="k-medoids" class="level4" data-number="2.1.1.2">
+<h4 data-number="2.1.1.2" class="anchored" data-anchor-id="k-medoids"><span class="header-section-number">2.1.1.2</span> <em>k</em>-medoids</h4>
+<p>Es un algoritmo clásico de particionado que divide el conjunto de datos en <span class="math inline">\(k\)</span> grupos. Nuevamente, este valor <span class="math inline">\(k\)</span> debe ser <em>definido por el usuario</em>. A diferencia del método anterior, este algoritmo identifica un elemento <em>real</em> de los datos como el <em>prototipo</em> o representante de los elementos incluidos en su grupo. Esto facilita mucho la interpretación de los resultados. El nombre del algoritmo fue popularizado por L. Kaufman y P.J. Rousseeuw con su algoritmo PAM (<em>Partitioning Around Medoids</em>).</p>
+<p>La <a href="#fig-kmedoids-clust" class="quarto-xref">Figura&nbsp;<span>2.3</span></a> muestra visualmente el proceso iterativo para encontrar los agrupamientos.</p>
+<div id="fig-kmedoids-clust" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmedoids-clust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/K-Medoids-Clustering.gif" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kmedoids-clust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;2.3: Proceso iterativo para definir los agrupamientos en el algoritmo <em>k</em>-medoids. Fuente: Wikipedia
+</figcaption>
+</figure>
+</div>
+<p>Como ocurría en el caso de <em>k</em>-means, se trata de un problema NP-hard para el que no se puede obtener una solución exacta, por lo que se suelen emplear heurísticos para solucionarlo. En el <a href="03-clust-part.html" class="quarto-xref"><span>Capítulo 3</span></a> veremos algunos ejemplos de variantes para solucionarlo implementadas en R.</p>
+</section>
+<section id="dbscan" class="level4" data-number="2.1.1.3">
+<h4 data-number="2.1.1.3" class="anchored" data-anchor-id="dbscan"><span class="header-section-number">2.1.1.3</span> DBSCAN</h4>
+<p>DBSCAN (<em>Density-Based Spatial Clustering of Applications with Noise</em>) es un algoritmo de agrupamiento basado en la densidad. A diferencia de métodos como <em>k</em>-means, que asumen que los clústeres quedan definidos por regiones de Voronoi basadas en la función de distancia (típicamente hiperesferas con distancia Euclídea), DBSCAN define los clústeres como regiones continuas de alta densidad de puntos, separadas por regiones de baja densidad.</p>
+<p>Su funcionamiento se rige por dos parámetros globales:</p>
+<ul>
+<li><span class="math inline">\(\varepsilon\)</span>: define el radio de vecindad alrededor de cada punto.</li>
+<li><span class="math inline">\(minPts\)</span>: mínimo número de puntos que deben caer dentro del radio de vecindad <span class="math inline">\(\varepsilon\)</span> para que esa región se considere <em>densa</em>.</li>
+</ul>
+<p>En base a estos parámetros, el algoritmo clasifica los elementos del dataset en tres posibles categorías:</p>
+<ol type="1">
+<li>Punto Núcleo (<em>Core Point</em>): un punto <span class="math inline">\(p\)</span> es un núcleo si su vecindad <span class="math inline">\(\varepsilon\)</span> contiene al menos <span class="math inline">\(minPts\)</span> elementos (incluyéndose a sí mismo).</li>
+<li>Punto Frontera (<em>Border Point</em>): un punto <span class="math inline">\(q\)</span> es frontera si es alcanzable desde un punto núcleo (está dentro de su distancia <span class="math inline">\(\varepsilon\)</span>), pero tiene menos de <span class="math inline">\(minPts\)</span> en su propia vecindad.</li>
+<li>Ruido (<em>Noise/Outlier</em>): un punto es ruido si no es ni núcleo ni frontera.</li>
+</ol>
+<p>A diferencia de los dos ejemplos anteriores, DBSCAN no requiere especificar <span class="math inline">\(k\)</span>, sino que el algoritmo puede determinar el número de agrupamientos según la densidad de los datos. Es especialmente propicio para detectar grupos con formas geométricas “complejas” (no convexas), como el “swiss roll”, arcos, anillos o zig-zags. Además, su diseño está pensado para detectar y filtrar los elementos que se consideren “ruido”. Se utiliza con frecuencia en bases de datos espaciales. No obstante, también tiene limitaciones, ya que puede tener dificultades en datasets con densidad variable en diferentes regiones o con datasets representados en espacios de alta dimensionalidad.</p>
+</section>
+</section>
+<section id="clustering-jerárquico" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="clustering-jerárquico"><span class="header-section-number">2.1.2</span> Clustering jerárquico</h3>
+<p>En el clustering jerárquico, los agrupamientos están anidados y pueden formar una estructura jerárquica, que se suele representar gráficamente en forma de un árbol llamado <strong>dendograma</strong>, como el que se presenta en la <a href="#fig-dendogram" class="quarto-xref">Figura&nbsp;<span>2.4</span></a>.</p>
+<div id="fig-dendogram" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-dendogram-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/dendrogram.png" class="img-fluid figure-img" style="width:90.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dendogram-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;2.4: Ejemplo de un dendograma que representa los agrupamientos encontrados tras aplicar un algoritmo de <em>clustering</em> jerárquico. Fuente: Figura 21.1 de <span class="citation" data-cites="boehmke2019">(<a href="references.html#ref-boehmke2019" role="doc-biblioref">Boehmke &amp; Greenwell, 2019</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>Debemos tener presente que, en función del nivel en el que “cortemos” el dendograma, obtendremos un número diferente de grupos. Por ejemplo, la <a href="#fig-dendogram-cuts" class="quarto-xref">Figura&nbsp;<span>2.5</span></a></p>
+<div id="fig-dendogram-cuts" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-dendogram-cuts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/dendogram-cuts.png" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dendogram-cuts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;2.5: Tres dendogramas que muestran diferentes cortes a distinto nivel del árbol. Izq.: dendograma original (sin cortes); (centro) corte a nivel 9, que genera dos agrupamientos; (dcha.) corte a nivel 5, que define 3 agrupamientos. Fuente: Figura 12.11 de <span class="citation" data-cites="james2021">(<a href="references.html#ref-james2021" role="doc-biblioref">James, 2021</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<section id="agnes" class="level4" data-number="2.1.2.1">
+<h4 data-number="2.1.2.1" class="anchored" data-anchor-id="agnes"><span class="header-section-number">2.1.2.1</span> AGNES</h4>
+<p>El método de <em>clustering</em> aglomerativo parte de un conjunto de <span class="math inline">\(n\)</span> grupos, uno por cada elemento de nuestro dataset. En cada iteración, une los dos grupos más similares hasta que se obtenga un único grupo que contiene a todos los datos.</p>
+<p>Para ello, se necesita establecer un criterio de “enlace” para fusionar los grupos, que determine la distancia entre dos agrupamientos. Se pueden usar varios criterios:</p>
+<ul>
+<li><p><em>Agrupamiento de enlace completo</em>: minimiza la distancia máxima entre las parejas de observaciones de dos agrupamientos.</p></li>
+<li><p><em>Agrupamiento de enlace promedio</em>: minimizar la media de las distancias entre las observaciones pertenecientes a dos clusteres (calculadas por pares).</p></li>
+<li><p><em>Agrupamiento de enlace mínimo o simple</em>: minimizar las distancias entre las observaciones más cercanas en dos clústers.</p></li>
+<li><p><em>Método de Ward</em>: minimizar la suma de las diferencias cuadráticas dentro de los clusteres. De ese modo, se minimiza la varianza total del conglomerado.</p></li>
+<li><p><em>Enlace de centroides</em>: se calcula la distancia entre el centroide del grupo A y el centroide del grupo B.</p></li>
+</ul>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
+<div id="ref-boehmke2019" class="csl-entry" role="listitem">
+Boehmke, B., &amp; Greenwell, B. (2019). <em>Hands-On Machine Learning with R</em> (1.ª ed.). Chapman; Hall/CRC. <a href="https://doi.org/10.1201/9780367816377">https://doi.org/10.1201/9780367816377</a>
+</div>
+<div id="ref-james2021" class="csl-entry" role="listitem">
+James, W., G. (2021). <em><span>An Introduction to Statistical Learning with Applications in R</span></em> (2.ª ed.). Springer. <a href="https://www.statlearning.com/">https://www.statlearning.com/</a>
+</div>
+<div id="ref-tan2019" class="csl-entry" role="listitem">
+Tan, P.-N., Steinbach, M. S., Karpatne, A., &amp; Kumar, V. (2019). <em>Introduction to Data Mining (Second Edition)</em>. Pearson.
+</div>
+</div>
+</section>
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

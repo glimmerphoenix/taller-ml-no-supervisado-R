@@ -20,7 +20,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -277,7 +297,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <ul>
-<li>La principal referencia práctica sobre implementación de modelos de aprendizaje máquina en R sigue siendo <span class="citation" data-cites="boehmke2019">(<a href="references.html#ref-boehmke2019" role="doc-biblioref"><strong>boehmke2019?</strong></a>)</span>, tal y como hemos visto en todo este taller.
+<li>La principal referencia práctica sobre implementación de modelos de aprendizaje máquina en R sigue siendo <span class="citation" data-cites="boehmke2019">(<a href="references.html#ref-boehmke2019" role="doc-biblioref">Boehmke &amp; Greenwell, 2019</a>)</span>, tal y como hemos visto en todo este taller.
 <ul>
 <li><a href="https://bradleyboehmke.github.io/HOML/">Libro completo publicado en abierto</a>.</li>
 </ul></li>
@@ -287,6 +307,11 @@ ul.task-list li input[type="checkbox"] {
 </ul>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
+<div id="ref-boehmke2019" class="csl-entry" role="listitem">
+Boehmke, B., &amp; Greenwell, B. (2019). <em>Hands-On Machine Learning with R</em> (1.ª ed.). Chapman; Hall/CRC. <a href="https://doi.org/10.1201/9780367816377">https://doi.org/10.1201/9780367816377</a>
+</div>
+</div>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

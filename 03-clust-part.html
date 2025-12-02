@@ -20,7 +20,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -251,15 +305,29 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#el-algoritmo-k-means" id="toc-el-algoritmo-k-means" class="nav-link active" data-scroll-target="#el-algoritmo-k-means"><span class="header-section-number">3.1</span> El algoritmo <em>k</em>-means</a>
+  <ul class="collapse">
+  <li><a href="#implementaciones-y-mejoras-en-k-means" id="toc-implementaciones-y-mejoras-en-k-means" class="nav-link" data-scroll-target="#implementaciones-y-mejoras-en-k-means"><span class="header-section-number">3.1.1</span> Implementaciones y mejoras en <em>k</em>-means</a></li>
+  <li><a href="#ejemplo-práctico-en-r" id="toc-ejemplo-práctico-en-r" class="nav-link" data-scroll-target="#ejemplo-práctico-en-r"><span class="header-section-number">3.1.2</span> Ejemplo práctico en R</a></li>
+  </ul></li>
+  <li><a href="#pam-el-algoritmo-k-medoids" id="toc-pam-el-algoritmo-k-medoids" class="nav-link" data-scroll-target="#pam-el-algoritmo-k-medoids"><span class="header-section-number">3.2</span> PAM: el algoritmo <em>k</em>-medoids</a>
+  <ul class="collapse">
+  <li><a href="#ejemplo-de-implementación-en-r" id="toc-ejemplo-de-implementación-en-r" class="nav-link" data-scroll-target="#ejemplo-de-implementación-en-r"><span class="header-section-number">3.2.1</span> Ejemplo de implementación en R</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03-clust-part.html">Clustering</a></li><li class="breadcrumb-item"><a href="./03-clust-part.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Clustering particionado</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Clustering particionado</span></h1>
+<h1 class="title"><span id="sec-part-clustering" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Clustering particionado</span></span></h1>
 </div>
 
 
@@ -276,9 +344,527 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Ejemplos de algoritmos de cada clase</p>
+<section id="el-algoritmo-k-means" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="el-algoritmo-k-means"><span class="header-section-number">3.1</span> El algoritmo <em>k</em>-means</h2>
+<p>A la hora de implementar en la práctica el algoritmo <em>k</em>-means, debemos tener en cuenta varios aspectos importantes.</p>
+<ul>
+<li>Ubicación de partida de los centroides: el algoritmo es sensible a la ubicación inicial de los <code>k</code> centroides para cada grupo. Una mala ubicación puede ofrecer un resultado nada óptimo o, incluso, provocar que el algoritmo no converja en un número razonable de iteraciones. Para resolver este problema, se ha propuesto el algoritmo <em>k-means++</em> <span class="citation" data-cites="arthur2007">(<a href="references.html#ref-arthur2007" role="doc-biblioref">Arthur &amp; Vassilvitskii, 2007</a>)</span>, que inicializa los centroides de forma que se asegure que la solución obtenida es razonablemente óptima.</li>
+<li>Función de distancia Euclídea: Como ya se ha avisado, la mayoría de implementaciónes de <em>k</em>-means en paquetes software y bibliotecas asumen que se va a emplear la distancia Euclídea para comparar los elementos, estableciendo como objetivo minimizar la WCSS.</li>
+<li>Método para elegir el número de agrupamientos <code>k</code>: puesto que no se puede saber a priori el mejor valor de <code>k</code>, se suele aconsejar emplear algún tipo de métrica de evaluación para ponderar la bondad de los grupo generados, comparando los resultados para diversos valores de <code>k</code>.</li>
+</ul>
+<section id="implementaciones-y-mejoras-en-k-means" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="implementaciones-y-mejoras-en-k-means"><span class="header-section-number">3.1.1</span> Implementaciones y mejoras en <em>k</em>-means</h3>
+<p>Otro aspecto poco conocido pero muy interesante es la existencia de un gran número de implementaciones para resolver el algoritmo <em>k</em>-means, que han ido surgiendo para acelerar el cómputo o ahorrar muchas operaciones <span class="citation" data-cites="wang2020efficiency">(<a href="references.html#ref-wang2020efficiency" role="doc-biblioref">Wang et&nbsp;al., 2020</a>)</span>. La <a href="#fig-kmeans-implem" class="quarto-xref">Figura&nbsp;<span>3.1</span></a> muestra una línea temporal que describe algunas de las mejoras más sobresalientes que se han ido desarrollando.</p>
+<div id="fig-kmeans-implem" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmeans-implem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/k-means-timeline.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kmeans-implem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.1: Línea temporal que muestra las implementaciones y mejoras más destacadas que se han desarrollado para resolver el problema del agrupamiento con <em>k</em>-means. Fuente: <span class="citation" data-cites="wang2020efficiency">(<a href="references.html#ref-wang2020efficiency" role="doc-biblioref">Wang et&nbsp;al., 2020</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>Es conveniente, siempre que sea posible, informarnos bien acerca de la implementación específica que integra el software que vamos a utilizar para resolver <em>k</em>-means, o si existen varias alternativas cuál de ellas es la más propicia para nuestros intereses.</p>
+</section>
+<section id="ejemplo-práctico-en-r" class="level3" data-number="3.1.2">
+<h3 data-number="3.1.2" class="anchored" data-anchor-id="ejemplo-práctico-en-r"><span class="header-section-number">3.1.2</span> Ejemplo práctico en R</h3>
+<p>Ejemplo tomado del Capítulo 12 de <span class="citation" data-cites="nwanganga2020">(<a href="references.html#ref-nwanganga2020" role="doc-biblioref">Nwanganga &amp; Chapple, 2020</a>)</span>.</p>
+<p><strong>Dataset: <code>college.csv</code></strong></p>
+<p>Este conjunto de datos contiene información sobre una lista de facultades y universidades en EE.UU. Los datos provienen del Departamento Estadounidense de Educación y se han filtrado y modificado para este ejemplo <span class="citation" data-cites="nwanganga2020">(<a href="references.html#ref-nwanganga2020" role="doc-biblioref">Nwanganga &amp; Chapple, 2020</a>)</span>. En total, contiene 1.270 observaciones.</p>
+<p>Las características son:</p>
+<ul>
+<li><code>id</code>: integer, id unívoco para cada observación.</li>
+<li><code>name</code>: nombre de la institución.</li>
+<li><code>city</code>: nombre de la ciudad en la que se ubica la institución.</li>
+<li><code>state</code>: abreviatura estándar con dos caracteres del nombre del estado en el que se encuentra la institución.</li>
+<li><code>region</code>: una de las cuatro regiones en las que está ubicada la institución. Valores: <code>"Northeast"</code>, <code>"Midwest"</code>, <code>"West"</code>, <code>"South"</code>.</li>
+<li><code>highest_degree</code>: es el máximo nivel de titulación ofrecido por la institución. Valores: <code>"Associate"</code>, <code>"Bachelor"</code>, <code>"Graduate"</code>, <code>"Nondegree"</code>.</li>
+<li><code>control</code>: naturaleza de la institución. Valores: <code>"Public"</code>, <code>"Private"</code>.</li>
+<li><code>gender</code>: género de los estudiantes en la institución. Valores: <code>"CoEd"</code>, <code>"Male"</code>, <code>"Female"</code>.</li>
+<li><code>admission_rate</code>: porcentaje del total de estudiantes que lo solicitan que son admitidos por la institución.</li>
+<li><code>sat_avg</code>: puntuación promedio de los solicitantes en el test SAT (rango: <code>400</code> a <code>1600</code>).</li>
+<li><code>undergrads</code>: número de estudiantes de pregrado en la institución.</li>
+<li><code>tuition</code>: coste de matriculación anual en la institución, en USD.</li>
+<li><code>faculty_salary-avg</code>: salario mensual promedio de los miembros del claustro, en dólares.</li>
+<li><code>loan_default_rate</code>: porcentaje de estudiantes que, más tarde, no pueden hacer frente a los pagos del préstamo de su matrícula.</li>
+<li><code>median_debt</code>: mediana del montante de la deuda contraída por estudiantes graduados, en USD.</li>
+<li><code>long</code>: coordenada de longitud del campus principal.</li>
+<li><code>lat</code>: coordenada de latitud del campus principal.</li>
+</ul>
+<p><strong>Objetivo</strong>: segmentar las facultades en grupos de observaciones similares entre sí, mediante el algoritmo <em>k</em>-means. Para acelerar la ejecución del ejemplo, se limitan los cálculos a las facultades ubicadas en el estado de Maryland, aunque los mismos procedimientos pueden aplicarse a otros subconjuntos de los datos.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install the packages needed for this code file</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("stats","factoextra","gridExtra","cluster"))</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and preview the colleges and universities dataset.</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>college <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/college.csv"</span>, <span class="at">col_types =</span> <span class="st">"nccfffffnnnnnnnnn"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat &lt;- vroom(...)
+  problems(dat)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a preview of the data.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(college)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1,270
+Columns: 17
+$ id                 &lt;dbl&gt; 102669, 101648, 100830, 101879, 100858, 100663, 101…
+$ name               &lt;chr&gt; "Alaska Pacific University", "Marion Military Insti…
+$ city               &lt;chr&gt; "Anchorage", "Marion", "Montgomery", "Florence", "A…
+$ state              &lt;fct&gt; AK, AL, AL, AL, AL, AL, AL, AL, AL, AL, AL, AL, AL,…
+$ region             &lt;fct&gt; West, South, South, South, South, South, South, Sou…
+$ highest_degree     &lt;fct&gt; Graduate, Associate, Graduate, Graduate, Graduate, …
+$ control            &lt;fct&gt; Private, Public, Public, Public, Public, Public, Pu…
+$ gender             &lt;fct&gt; CoEd, CoEd, CoEd, CoEd, CoEd, CoEd, CoEd, CoEd, CoE…
+$ admission_rate     &lt;dbl&gt; 0.4207, 0.6139, 0.8017, 0.6788, 0.8347, 0.8569, 0.8…
+$ sat_avg            &lt;dbl&gt; 1054, 1055, 1009, 1029, 1215, 1107, 1041, 1165, 107…
+$ undergrads         &lt;dbl&gt; 275, 433, 4304, 5485, 20514, 11383, 7060, 3033, 264…
+$ tuition            &lt;dbl&gt; 19610, 8778, 9080, 7412, 10200, 7510, 7092, 27324, …
+$ faculty_salary_avg &lt;dbl&gt; 5804, 5916, 7255, 7424, 9487, 9957, 6801, 8367, 743…
+$ loan_default_rate  &lt;dbl&gt; 0.077, 0.136, 0.106, 0.111, 0.045, 0.062, 0.096, 0.…
+$ median_debt        &lt;dbl&gt; 23250.0, 11500.0, 21335.0, 21500.0, 21831.0, 21941.…
+$ lon                &lt;dbl&gt; -149.90028, -87.31917, -86.29997, -87.67725, -85.48…
+$ lat                &lt;dbl&gt; 61.21806, 32.63235, 32.36681, 34.79981, 32.60986, 3…</code></pre>
+</div>
+</div>
+<p>Preparamos el dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's limit our dataset to only colleges in the state of Maryland.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># We also convert the name of each college to the row labels.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>maryland_college <span class="ot">&lt;-</span> college <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> <span class="st">"MD"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">"name"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's take a look at the summary stats for the dataset.</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>maryland_college <span class="sc">%&gt;%</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(admission_rate, sat_avg) <span class="sc">%&gt;%</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> admission_rate      sat_avg    
+ Min.   :0.1608   Min.   : 842  
+ 1st Qu.:0.5181   1st Qu.: 900  
+ Median :0.5961   Median :1048  
+ Mean   :0.5886   Mean   :1062  
+ 3rd Qu.:0.6606   3rd Qu.:1176  
+ Max.   :0.8696   Max.   :1439  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The summary statistics show a wide range of values for our features.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># In order to avoid features with large ranges from dominating our model,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># we need to normalize the features using the scale() function for z-score normalization.</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>maryland_college_scaled <span class="ot">&lt;-</span> maryland_college <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(admission_rate, sat_avg) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># What do we have now?</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>maryland_college_scaled <span class="sc">%&gt;%</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> admission_rate        sat_avg       
+ Min.   :-2.77601   Min.   :-1.2512  
+ 1st Qu.:-0.45725   1st Qu.:-0.9218  
+ Median : 0.04895   Median :-0.0813  
+ Mean   : 0.00000   Mean   : 0.0000  
+ 3rd Qu.: 0.46753   3rd Qu.: 0.6485  
+ Max.   : 1.82387   Max.   : 2.1393  </code></pre>
+</div>
+</div>
+<p>Ejecutamos <em>k</em>-means</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We are now ready to attempt to cluster the data.</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># We set the value for k to 3 and choose to use 25 different initial configurations.</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The use of set.seed() ensures that every time we run our code, we get the same results.</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>k_3 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(maryland_college_scaled, <span class="at">centers=</span><span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Evaluamos los resultados</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's take a look at the size of the clusters...</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>k_3<span class="sc">$</span>size</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2 9 8</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ...and the cluster centers.</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>k_3<span class="sc">$</span>centers</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  admission_rate    sat_avg
+1     -1.7425275  1.7871932
+2     -0.2001854 -0.8322366
+3      0.6608405  0.4894679</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can also visualize the clusters to get additional insight.</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(k_3,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> maryland_college_scaled,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">repel =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-kmeans-eval" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmeans-eval-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-clust-part_files/figure-html/fig-kmeans-eval-1.png" id="fig-kmeans-eval" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-kmeans-eval-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.2
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To further evaluate our results, we need to look at how attributes vary by cluster.</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>maryland_college <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> k_3<span class="sc">$</span>cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(cluster,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>         undergrads,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>         tuition,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>         faculty_salary_avg,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>         loan_default_rate,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>         median_debt) <span class="sc">%&gt;%</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise_all</span>(<span class="st">"mean"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 6
+  cluster undergrads tuition faculty_salary_avg loan_default_rate median_debt
+    &lt;int&gt;      &lt;dbl&gt;   &lt;dbl&gt;              &lt;dbl&gt;             &lt;dbl&gt;       &lt;dbl&gt;
+1       1     16286.  28244.             11258             0.0175      17875 
+2       2      3407   14219.              7781.            0.108       24776.
+3       3      4711.  27523.              7593.            0.045       23925.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's see how varying the number of clusters affects the results.</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>k_4 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(maryland_college_scaled, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>k_5 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(maryland_college_scaled, <span class="at">centers =</span> <span class="dv">5</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>k_6 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(maryland_college_scaled, <span class="at">centers =</span> <span class="dv">6</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot and compare the results.</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">fviz_cluster</span>(k_3, <span class="at">geom =</span> <span class="st">"point"</span>, <span class="at">data =</span> maryland_college_scaled) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"k = 3"</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">fviz_cluster</span>(k_4, <span class="at">geom =</span> <span class="st">"point"</span>, <span class="at">data =</span> maryland_college_scaled) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"k = 4"</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">fviz_cluster</span>(k_5, <span class="at">geom =</span> <span class="st">"point"</span>, <span class="at">data =</span> maryland_college_scaled) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"k = 5"</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> <span class="fu">fviz_cluster</span>(k_6, <span class="at">geom =</span> <span class="st">"point"</span>, <span class="at">data =</span> maryland_college_scaled) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"k = 6"</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Here, we make use of the grid.arrange() function in the gridExtra package to display several plots at the same time.</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(p1, p2, p3, p4, <span class="at">nrow =</span> <span class="dv">2</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-kmeans-optim" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmeans-optim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-clust-part_files/figure-html/fig-kmeans-optim-1.png" id="fig-kmeans-optim" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-kmeans-optim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.3
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Pregunta: optimizando el número de centroides
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A partir de los resultados del gráfico anterior, ¿puedes decir cuál es el número de centroides óptimo para el agrupamiento de estos datos?</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now let's try to choose an ideal value for k based on the elbow method.</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: The geom_point() function is used to create additional circles on the plot.</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(maryland_college_scaled, kmeans, <span class="at">method =</span> <span class="st">"wss"</span>) <span class="sc">+</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="dv">4</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fl">7.3</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"red"</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">stroke =</span> <span class="fl">1.5</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="dv">7</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fl">2.3</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"red"</span>,</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">stroke =</span> <span class="fl">1.5</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-kmeans-select-k" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmeans-select-k-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-clust-part_files/figure-html/fig-kmeans-select-k-1.png" id="fig-kmeans-select-k" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-kmeans-select-k-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.4
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What about based on the silhouette method?</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(maryland_college_scaled, kmeans, <span class="at">method =</span> <span class="st">"silhouette"</span>) <span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="dv">4</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fl">0.393</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"red"</span>,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">stroke =</span> <span class="fl">1.5</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="dv">7</span>,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fl">0.375</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"red"</span>,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">stroke =</span> <span class="fl">1.5</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-kmeans-silhouette" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmeans-silhouette-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-clust-part_files/figure-html/fig-kmeans-silhouette-1.png" id="fig-kmeans-silhouette" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-kmeans-silhouette-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.5
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now, let's see what the gap statistic tells us.</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(maryland_college_scaled, kmeans, <span class="at">method =</span> <span class="st">"gap_stat"</span>) <span class="sc">+</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="dv">1</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fl">0.218</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"red"</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">stroke =</span> <span class="fl">1.5</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="dv">7</span>,</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fl">0.2</span>,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"red"</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">stroke =</span> <span class="fl">1.5</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette("ggplot2-in-packages")` for more information.
+ℹ The deprecated feature was likely used in the factoextra package.
+  Please report the issue at &lt;https://github.com/kassambara/factoextra/issues&gt;.</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-kmeans-gap" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmeans-gap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-clust-part_files/figure-html/fig-kmeans-gap-1.png" id="fig-kmeans-gap" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-kmeans-gap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.6
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternatively, we can use fviz_gap_stat() function to generate the similar plot for gap statistics.</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: The two plot may not be exactly alike because fviz_nbclust() function does not specify the nstart argument. </span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>gap_stat <span class="ot">&lt;-</span> <span class="fu">clusGap</span>(maryland_college_scaled, <span class="at">FUN =</span> kmeans, <span class="at">nstart =</span> <span class="dv">25</span>, <span class="at">K.max =</span> <span class="dv">10</span>, <span class="at">B =</span> <span class="dv">10</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_gap_stat</span>(gap_stat)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-kmeans-gap-alt" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmeans-gap-alt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-clust-part_files/figure-html/fig-kmeans-gap-alt-1.png" id="fig-kmeans-gap-alt" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-kmeans-gap-alt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.7
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Otra forma de calcular <em>k</em>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A partir de los resultados del gráfico anterior, ¿puedes decir cuál es el número de centroides óptimo para el agrupamiento de estos datos?</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>k_4 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(maryland_college_scaled, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  k_4,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> maryland_college_scaled,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"Maryland Colleges Segmented by SAT Scores and Admission Rates"</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">repel =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-kmeans-koptim" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmeans-koptim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-clust-part_files/figure-html/fig-kmeans-koptim-1.png" id="fig-kmeans-koptim" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-kmeans-koptim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.8
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Ejercicios adicionales
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Repite los cálculos anteriores para las escuelas ubicadas en el estado de Indinana. Céntrate en las variables <code>faculty_salary-avg</code> y <code>tuition</code>. Elige <code>k=3</code> para visualizar los grupos identificados.</li>
+<li>Emplea las técnicas descritas arriba para elegir el número óptimo de clústeres en el problema del apartado 1). Justifica tu respuesta.</li>
+<li>Genera diagramas de agrupamiento para los dos posibles valores de <code>k</code> que has seleccionado en el apartado 2) anterior. ¿Cuál piensas que es el valor óptimo y por qué?</li>
+</ol>
+</div>
+</div>
+</section>
+</section>
+<section id="pam-el-algoritmo-k-medoids" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="pam-el-algoritmo-k-medoids"><span class="header-section-number">3.2</span> PAM: el algoritmo <em>k</em>-medoids</h2>
+<p>El algoritmo <em>k</em>-medoids tiene algunas importantes ventajas respecto de <em>k</em>-means:</p>
+<ul>
+<li>Los prototipos de cada grupo no son <em>centroides</em> (puntos ficticios o sintéticos) sino <em>medoides, es decir, elementos </em>reales* del dataset. Esto facilita mucho la interpretación de los resultados, puesto que se puede analizar las características de cada elemento prototipo para concluir cuáles son los principales rasgos de los elementos de ese grupo.</li>
+<li>Mientras que en muchas implementaciones de <em>k</em>-means, se asume que vamos a emplear la función de distancia Euclídea y que se busca minimizar la WCSS para resolver el problema, en las implementaciones de <em>k</em>-medoids se pueden utilizar <strong>funciones de distancia arbitrarias</strong> para comparar y agrupar los elementos.</li>
+</ul>
+<p>También existen implementaciones con rendimiento mejorado de este algoritmo. Por ejemplo, el paquete <a href="https://cran.r-project.org/web/packages/fastkmedoids/refman/fastkmedoids.html"><code>fastkmedoids</code> en R</a> proporciona <em>wrappers</em> para las implementaciones en C++ de varios algoritmos más rápidos para resolver el problema PAM (FastPAM, FastCLARA Y FastCLARANS) <span class="citation" data-cites="schubert2019fastPAM">(<a href="references.html#ref-schubert2019fastPAM" role="doc-biblioref">Schubert &amp; Rousseeuw, 2019</a>)</span>.</p>
+<section id="ejemplo-de-implementación-en-r" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="ejemplo-de-implementación-en-r"><span class="header-section-number">3.2.1</span> Ejemplo de implementación en R</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Cargar librerías necesarias</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Si no tienes fastkmedoids: install.packages("fastkmedoids")</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fastkmedoids)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel) <span class="co"># Opcional: para que las etiquetas de texto no se solapen</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Cargar y preparar los datos</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"USArrests"</span>)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Es fundamental escalar los datos porque 'Assault' tiene valores mucho más grandes</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co"># que 'Murder', lo que sesgaría el cálculo de distancias.</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>df_scaled <span class="ot">&lt;-</span> <span class="fu">scale</span>(USArrests)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co"># fastpam requiere una matriz de distancias, no el dataframe directo</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>dist_matrix <span class="ot">&lt;-</span> <span class="fu">dist</span>(df_scaled, <span class="at">method =</span> <span class="st">"euclidean"</span>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Ejecutar fastpam (K-Medoids rápido)</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">4</span> <span class="co"># Elegimos 4 grupos para este ejemplo</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>resultado <span class="ot">&lt;-</span> <span class="fu">fastpam</span>(dist_matrix, <span class="at">n=</span><span class="fu">nrow</span>(df_scaled), <span class="at">k =</span> k)</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="co"># El objeto 'resultado' tiene:</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a><span class="co"># resultado@medoids: los índices (filas) de los estados que son medoides</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="co"># resultado@assignment: el grupo asignado a cada estado</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a><span class="co"># resultado@cost: valor final de la función de coste</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Reducción de dimensión para visualización (PCA)</span></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Necesitamos pasar de 4 variables a 2 ejes (PC1 y PC2) para poder graficar</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(df_scaled)</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>pca_data <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]) <span class="co"># Tomamos las dos primeras componentes</span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Construimos el data.frame para el gráfico</span></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos la información del cluster y si es medoide o no</span></span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>pca_data<span class="sc">$</span>Cluster <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(resultado<span class="sc">@</span>assignment)</span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>pca_data<span class="sc">$</span>State   <span class="ot">&lt;-</span> <span class="fu">rownames</span>(USArrests)</span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>pca_data<span class="sc">$</span>IsMedoid <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Marcamos cuáles filas son los medoides reales encontrados por fastpam</span></span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>pca_data<span class="sc">$</span>IsMedoid[resultado<span class="sc">@</span>medoids] <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Creación del gráfico con ggplot2</span></span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pca_data, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> Cluster)) <span class="sc">+</span></span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>  <span class="co"># A. Dibujar los puntos normales (Estados)</span></span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>  <span class="co"># B. Dibujar los Medoides (Más grandes y con forma diferente)</span></span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">subset</span>(pca_data, IsMedoid <span class="sc">==</span> <span class="cn">TRUE</span>), </span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="dv">5</span>, <span class="at">shape =</span> <span class="dv">18</span>, <span class="at">stroke =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a>  <span class="co"># C. Etiquetas para los medoides (Nombres de los estados representativos)</span></span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> <span class="fu">subset</span>(pca_data, IsMedoid <span class="sc">==</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">label =</span> State),</span>
+<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a>                   <span class="at">box.padding =</span> <span class="fl">0.5</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># D. Elipses para visualizar las áreas de los grupos (Opcional)</span></span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_ellipse</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Cluster), <span class="at">geom =</span> <span class="st">"polygon"</span>, <span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb24-58"><a href="#cb24-58" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-59"><a href="#cb24-59" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estética general</span></span>
+<span id="cb24-60"><a href="#cb24-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb24-61"><a href="#cb24-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Visualización de Clustering con fastpam (USArrests)"</span>,</span>
+<span id="cb24-62"><a href="#cb24-62" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Los rombos grandes indican los Medoides (Centros reales de cada grupo)"</span>,</span>
+<span id="cb24-63"><a href="#cb24-63" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Componente Principal 1"</span>,</span>
+<span id="cb24-64"><a href="#cb24-64" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Componente Principal 2"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-fastkmedoids" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-fastkmedoids-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-clust-part_files/figure-html/fig-fastkmedoids-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fastkmedoids-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.9: Resultado del clustering con <code>fastkmedoids</code> sobre el dataset USArrests.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
+<div id="ref-arthur2007" class="csl-entry" role="listitem">
+Arthur, D., &amp; Vassilvitskii, S. (2007). k-means++: the advantages of careful seeding. En N. Bansal, K. Pruhs, &amp; C. Stein (Eds.), <em>Proceedings of the Eighteenth Annual <span>ACM-SIAM</span> Symposium on Discrete Algorithms, <span>SODA</span> 2007, New Orleans, Louisiana, USA, January 7-9, 2007</em> (pp. 1027-1035). <span>SIAM</span>.
+</div>
+<div id="ref-nwanganga2020" class="csl-entry" role="listitem">
+Nwanganga, F., &amp; Chapple, M. (2020). <em>Practical Machine Learning in R</em> (1.ª ed.). John Wiley &amp; Sons, Inc. <a href="https://www.wiley.com/en-us/Practical+Machine+Learning+in+R-p-9781119591535">https://www.wiley.com/en-us/Practical+Machine+Learning+in+R-p-9781119591535</a>
+</div>
+<div id="ref-schubert2019fastPAM" class="csl-entry" role="listitem">
+Schubert, E., &amp; Rousseeuw, P. J. (2019). Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS Algorithms. En G. Amato, C. Gennaro, V. Oria, &amp; M. Radovanović (Eds.), <em>Similarity Search and Applications</em> (pp. 171-187). Springer International Publishing.
+</div>
+<div id="ref-wang2020efficiency" class="csl-entry" role="listitem">
+Wang, S., Sun, Y., &amp; Bao, Z. (2020). On the efficiency of K-means clustering: evaluation, optimization, and algorithm selection. <em>Proc. VLDB Endow.</em>, <em>14</em>(2), 163-175. <a href="https://doi.org/10.14778/3425879.3425887">https://doi.org/10.14778/3425879.3425887</a>
+</div>
+</div>
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

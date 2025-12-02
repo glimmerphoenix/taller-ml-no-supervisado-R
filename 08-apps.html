@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -69,6 +103,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -251,11 +314,22 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#segmentación-de-clientes-de-un-centro-comercial" id="toc-segmentación-de-clientes-de-un-centro-comercial" class="nav-link active" data-scroll-target="#segmentación-de-clientes-de-un-centro-comercial"><span class="header-section-number">8.1</span> Segmentación de clientes de un centro comercial</a>
+  <ul class="collapse">
+  <li><a href="#resolución-con-k-means" id="toc-resolución-con-k-means" class="nav-link" data-scroll-target="#resolución-con-k-means"><span class="header-section-number">8.1.1</span> Resolución con <em>k</em>-means</a></li>
+  <li><a href="#resolución-con-pam-k-medoids" id="toc-resolución-con-pam-k-medoids" class="nav-link" data-scroll-target="#resolución-con-pam-k-medoids"><span class="header-section-number">8.1.2</span> Resolución con PAM (<em>k</em>-medoids)</a></li>
+  </ul></li>
+  <li><a href="#ejemplo-de-reducc.-dim." id="toc-ejemplo-de-reducc.-dim." class="nav-link" data-scroll-target="#ejemplo-de-reducc.-dim."><span class="header-section-number">8.2</span> Ejemplo de reducc. dim.</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content page-columns page-full" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./08-apps.html">Aplicaciones</a></li><li class="breadcrumb-item"><a href="./08-apps.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Aplicaciones</span></a></li></ol></nav>
 <div class="quarto-title">
@@ -276,11 +350,435 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Ejemplo de clustering</p>
-<p>Ejemplo de reducc. dim.</p>
-<p>Ejemplo de autocodif?</p>
+<section id="segmentación-de-clientes-de-un-centro-comercial" class="level2 page-columns page-full" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="segmentación-de-clientes-de-un-centro-comercial"><span class="header-section-number">8.1</span> Segmentación de clientes de un centro comercial</h2>
+<p>En este caso de estudio, se analizan 200 observaciones correspondientes a clientes de un centro comercial. Cada registro de cliente incluye las siguientes variables:</p>
+<ul>
+<li><code>CustomerID</code>: identificador unívoco de cliente.</li>
+<li><code>Gender</code>: género.</li>
+<li><code>Age</code>: edad.</li>
+<li><code>Income</code>: salario anual.</li>
+<li><code>SpendingScore</code>: puntuación (entre 1 y 100) sobre la propensión de compra del cliente, basado en sus hábitos de compra y otros factores.</li>
+</ul>
+<section id="resolución-con-k-means" class="level3 page-columns page-full" data-number="8.1.1">
+<h3 data-number="8.1.1" class="anchored" data-anchor-id="resolución-con-k-means"><span class="header-section-number">8.1.1</span> Resolución con <em>k</em>-means</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>mallcustomers <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/mallcustomers.csv"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(mallcustomers)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 200
+Columns: 5
+$ CustomerID    &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 1…
+$ Gender        &lt;chr&gt; "Male", "Male", "Female", "Female", "Female", "Female", …
+$ Age           &lt;dbl&gt; 19, 21, 20, 23, 31, 22, 35, 23, 64, 30, 67, 35, 58, 24, …
+$ Income        &lt;chr&gt; "15,000 USD", "15,000 USD", "16,000 USD", "16,000 USD", …
+$ SpendingScore &lt;dbl&gt; 39, 81, 6, 77, 40, 76, 6, 94, 3, 72, 14, 99, 15, 77, 13,…</code></pre>
+</div>
+</div>
+<p>Preparamos los datos.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We have a couple of things we need to do to prepare the data.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The first is to convert the Gender feature to a factor.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The second is to convert the income feature to a number.</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># This requires that we remove both the USD and the "," in the data.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>mallcustomers <span class="ot">&lt;-</span> mallcustomers <span class="sc">%&gt;%</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Income =</span> <span class="fu">str_replace_all</span>(Income,<span class="st">" USD"</span>,<span class="st">""</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Income =</span> <span class="fu">str_replace_all</span>(Income,<span class="st">","</span>,<span class="st">""</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Income =</span> <span class="fu">as.numeric</span>(Income))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mallcustomers)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   CustomerID        Gender               Age            Income      
+ Min.   :  1.00   Length:200         Min.   :18.00   Min.   : 15000  
+ 1st Qu.: 50.75   Class :character   1st Qu.:28.75   1st Qu.: 41500  
+ Median :100.50   Mode  :character   Median :36.00   Median : 61500  
+ Mean   :100.50                      Mean   :38.85   Mean   : 60560  
+ 3rd Qu.:150.25                      3rd Qu.:49.00   3rd Qu.: 78000  
+ Max.   :200.00                      Max.   :70.00   Max.   :137000  
+ SpendingScore  
+ Min.   : 1.00  
+ 1st Qu.:34.75  
+ Median :50.00  
+ Mean   :50.20  
+ 3rd Qu.:73.00  
+ Max.   :99.00  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We intend to segment based on Income and SpendingScore only.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># So, we remove everything else and normalize our features.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>mallcustomers_scaled <span class="ot">&lt;-</span> mallcustomers <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>CustomerID, <span class="sc">-</span>Gender, <span class="sc">-</span>Age) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>()</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># What does the data now look like?</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mallcustomers_scaled)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Income         SpendingScore      
+ Min.   :-1.73465   Min.   :-1.905240  
+ 1st Qu.:-0.72569   1st Qu.:-0.598292  
+ Median : 0.03579   Median :-0.007745  
+ Mean   : 0.00000   Mean   : 0.000000  
+ 3rd Qu.: 0.66401   3rd Qu.: 0.882916  
+ Max.   : 2.91037   Max.   : 1.889750  </code></pre>
+</div>
+</div>
+<p>Ahora, ejecutamos el algoritmo de <em>clustering</em>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Elbow Method</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">fviz_nbclust</span>(mallcustomers_scaled, kmeans, <span class="at">method =</span> <span class="st">"wss"</span>) <span class="sc">+</span> <span class="fu">geom_point</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">6</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="dv">60</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">colour =</span> <span class="st">"red"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">stroke =</span> <span class="fl">1.5</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"Elbow Method"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Silhouette Method</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">fviz_nbclust</span>(mallcustomers_scaled, kmeans, <span class="at">method =</span> <span class="st">"silhouette"</span>) <span class="sc">+</span> <span class="fu">geom_point</span>(</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">6</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fl">0.53</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">colour =</span> <span class="st">"red"</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">stroke =</span> <span class="fl">1.5</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"Silhouette Method"</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Gap Statistic</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">fviz_nbclust</span>(mallcustomers_scaled, kmeans, <span class="at">method =</span> <span class="st">"gap_stat"</span>) <span class="sc">+</span> <span class="fu">geom_point</span>(</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">6</span>,</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fl">0.57</span>,</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">colour =</span> <span class="st">"red"</span>,</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">stroke =</span> <span class="fl">1.5</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"Gap Statistic"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette("ggplot2-in-packages")` for more information.
+ℹ The deprecated feature was likely used in the factoextra package.
+  Please report the issue at &lt;https://github.com/kassambara/factoextra/issues&gt;.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(p1, p2, p3, <span class="at">nrow =</span> <span class="dv">3</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-case-kmeans-clust" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-case-kmeans-clust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="08-apps_files/figure-html/fig-case-kmeans-clust-1.png" id="fig-case-kmeans-clust" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-case-kmeans-clust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;8.1
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Elegimos <span class="math inline">\(k=6\)</span>. Ahora, repetimos el algoritmo con 25 configuraciones iniciales diferentes.</p>
+<div class="cell page-columns page-full">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We set the value for k to 6 and choose to use 25 different initial configurations.</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>k_clust <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(mallcustomers_scaled, <span class="at">centers =</span> <span class="dv">6</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  k_clust,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mallcustomers_scaled,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"Mall Customers Segmented by Income and Spending Score"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">repel =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display page-columns page-full">
+<div id="fig-case-kmeans-kopt" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full" width="1440">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full">
+<div aria-describedby="fig-case-kmeans-kopt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="page-columns page-full">
+<img src="08-apps_files/figure-html/fig-case-kmeans-kopt-1.png" id="fig-case-kmeans-kopt" class="img-fluid figure-img column-page-right" width="1440">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-case-kmeans-kopt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;8.2
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To further evaluate our results, we need to look at how attributes vary by cluster.</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>mallcustomers <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> k_clust<span class="sc">$</span>cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Male =</span> <span class="fu">ifelse</span>(Gender <span class="sc">==</span> <span class="st">"Male"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Female =</span> <span class="fu">ifelse</span>(Gender <span class="sc">==</span> <span class="st">"Female"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(cluster, Male, Female, Age) <span class="sc">%&gt;%</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise_all</span>(<span class="st">"mean"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  cluster  Male Female   Age
+    &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+1       1 0.483  0.517  32.9
+2       2 0.4    0.6    32.2
+3       3 0.543  0.457  41.1
+4       4 0.391  0.609  45.2
+5       5 0.407  0.593  42.7
+6       6 0.409  0.591  25.3</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>mallcustomers_tagged <span class="ot">&lt;-</span> mallcustomers <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Cluster =</span> <span class="fu">as.factor</span>(k_clust<span class="sc">$</span>cluster))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mallcustomers_tagged)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  CustomerID Gender   Age Income SpendingScore Cluster
+       &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt; &lt;fct&gt;  
+1          1 Male      19  15000            39 4      
+2          2 Male      21  15000            81 6      
+3          3 Female    20  16000             6 4      
+4          4 Female    23  16000            77 6      
+5          5 Female    31  17000            40 4      
+6          6 Female    22  17000            76 6      </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Resumen estadístico por grupo</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>resumen <span class="ot">&lt;-</span> mallcustomers_tagged <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Cantidad =</span> <span class="fu">n</span>(),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Edad_Promedio =</span> <span class="fu">mean</span>(Age),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Ingreso_Promedio =</span> <span class="fu">mean</span>(Income),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Spending_Promedio =</span> <span class="fu">mean</span>(SpendingScore)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(resumen)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  Cluster Cantidad Edad_Promedio Ingreso_Promedio Spending_Promedio
+  &lt;fct&gt;      &lt;int&gt;         &lt;dbl&gt;            &lt;dbl&gt;             &lt;dbl&gt;
+1 1             29          32.9           78552.              82.2
+2 2             10          32.2          109700               82  
+3 3             35          41.1           88200               17.1
+4 4             23          45.2           26304.              20.9
+5 5             81          42.7           55296.              49.5
+6 6             22          25.3           25727.              79.4</code></pre>
+</div>
+</div>
+<p>Ahora, podemos tratar de identificar algunos perfiles frecuentes de clientes:</p>
+<ol type="1">
+<li><em>Ahorradores</em>: ingresos altos, pero bajo <code>SpendingScore</code>.</li>
+<li><em>Derrochadores</em>: ingresos bajos, pero alto <code>SpendingScore</code>.</li>
+<li><em>Clientes </em>premium* *: ingresos altos y alto <code>SpendingScore</code> (este sería el grupo más valioso para los comerciantes).</li>
+<li><em>Promedio</em>: ingresos medios y gasto medio.</li>
+</ol>
+</section>
+<section id="resolución-con-pam-k-medoids" class="level3" data-number="8.1.2">
+<h3 data-number="8.1.2" class="anchored" data-anchor-id="resolución-con-pam-k-medoids"><span class="header-section-number">8.1.2</span> Resolución con PAM (<em>k</em>-medoids)</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Cargar y limpiar datos</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/mallcustomers.csv"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 200 Columns: 5
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): Gender, Income
+dbl (3): CustomerID, Age, SpendingScore
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>datos_limpios <span class="ot">&lt;-</span> datos <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Income =</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">"[^0-9]"</span>, <span class="st">""</span>, Income)),</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Gender =</span> <span class="fu">as.factor</span>(Gender)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Seleccionar y Escalar (Fundamental para PAM también)</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>datos_num <span class="ot">&lt;-</span> datos_limpios <span class="sc">%&gt;%</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Age, Income, SpendingScore)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>datos_scaled <span class="ot">&lt;-</span> <span class="fu">scale</span>(datos_num)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Selección del número óptimo de grupos.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Método de la Silueta para PAM</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(datos_scaled, cluster<span class="sc">::</span>pam, <span class="at">method =</span> <span class="st">"silhouette"</span>) <span class="sc">+</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">"Número óptimo de clusters para PAM (Silueta)"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-apps_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Método del Codo (Elbow) para PAM</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(datos_scaled, cluster<span class="sc">::</span>pam, <span class="at">method =</span> <span class="st">"wss"</span>) <span class="sc">+</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">6</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">"Número óptimo de clusters para PAM (Codo)"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-apps_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Ejecutamos PAM con k=6</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># metric = "euclidean" es el estándar, pero PAM permite "manhattan" también.</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>pam_res <span class="ot">&lt;-</span> <span class="fu">pam</span>(datos_scaled, <span class="at">k =</span> <span class="dv">6</span>, <span class="at">metric =</span> <span class="st">"euclidean"</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Resumen básico</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pam_res)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Medoids:
+      ID        Age      Income SpendingScore
+[1,]  22 -0.9914806 -1.39198127   0.882915982
+[2,]  35  0.7266085 -1.04931630  -1.401822744
+[3,]  81  1.2993049 -0.24976469   0.030979508
+[4,]  98 -0.8483065 -0.02132138  -0.007744877
+[5,] 176 -0.6335454  1.04474743   1.386332990
+[6,] 167  0.2254992  0.96859966  -1.169476433
+Clustering vector:
+  [1] 1 1 2 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2
+ [38] 1 2 1 3 1 2 1 2 1 3 4 4 4 3 4 4 3 3 3 3 3 4 3 3 4 3 3 3 4 3 3 4 4 3 3 3 3
+ [75] 3 4 3 4 4 3 3 4 3 3 4 3 3 4 4 3 3 4 3 4 4 4 3 4 3 4 4 3 3 4 3 4 3 3 3 3 3
+[112] 4 4 4 4 4 3 3 3 3 4 4 4 5 4 5 6 5 6 5 6 5 4 5 6 5 6 5 4 5 6 5 4 5 6 5 6 5
+[149] 6 5 6 5 6 5 6 5 6 5 6 5 3 5 6 5 6 5 6 5 6 5 6 5 6 5 6 5 6 5 6 5 6 5 6 5 6
+[186] 5 6 5 6 5 6 5 6 5 6 5 6 5 6 5
+Objective function:
+    build      swap 
+0.8095825 0.7542872 
+
+Available components:
+ [1] "medoids"    "id.med"     "clustering" "objective"  "isolation" 
+ [6] "clusinfo"   "silinfo"    "diss"       "call"       "data"      </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(pam_res, </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> datos_scaled,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">palette =</span> <span class="st">"jco"</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">ellipse.type =</span> <span class="st">"t"</span>, <span class="co"># 't' asume distribución t (menos estricto que convex)</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">repel =</span> <span class="cn">TRUE</span>,       <span class="co"># Evita solapamiento de texto</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">ggtheme =</span> <span class="fu">theme_classic</span>(),</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">main =</span> <span class="st">"Clustering con PAM (K-Medoids)"</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-case-kmed-clust-groups" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-case-kmed-clust-groups-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="08-apps_files/figure-html/fig-case-kmed-clust-groups-1.png" id="fig-case-kmed-clust-groups" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-case-kmed-clust-groups-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;8.3
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Evaluación de la calidad del agrupamiento mediante el gráfico de Silueta.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualización detallada de la Silueta</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>grafico_silueta <span class="ot">&lt;-</span> <span class="fu">fviz_silhouette</span>(pam_res, <span class="at">palette =</span> <span class="st">"jco"</span>, <span class="at">print.summary =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostrar el gráfico</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(grafico_silueta)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-apps_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>En la gráfica, cada barra horizontal representa a un cliente. Las barras están ordenadas por <em>cluster</em> (agrupamiento), mientras que la línea roja punteada señala el valor del promedio global. Si la mayoría de barras superan esta línea, entonces el <em>clustering</em> se considera robusto.</p>
+<p>¿Cuáles serían los clientes potencialmente mal clasificados?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Calcular los valores de silueta individuales</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>sil_values <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(pam_res<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Identificar índices con silueta negativa (mal clasificados)</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>indices_negativos <span class="ot">&lt;-</span> <span class="fu">which</span>(sil_values[, <span class="st">"sil_width"</span>] <span class="sc">&lt;</span> <span class="dv">0</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Mostrar quiénes son esos clientes en el dataset original</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co"># (Si no hay resultados, ¡felicidades! tu clustering es muy limpio)</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>clientes_problematicos <span class="ot">&lt;-</span> datos_limpios[indices_negativos, ]</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Clientes con silueta negativa (posibles outliers):"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Clientes con silueta negativa (posibles outliers):"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(clientes_problematicos)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  CustomerID Gender   Age Income SpendingScore
+       &lt;dbl&gt; &lt;fct&gt;  &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;
+1          5 Female    31  17000            40
+2         43 Male      48  39000            36
+3         44 Female    31  39000            61
+4        135 Male      20  73000             5
+5        147 Male      48  77000            36</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Ver a qué cluster fueron asignados vs a cuál deberían ir (vecino más cercano)</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>info_negativos <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ClienteID =</span> indices_negativos,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Cluster_Asignado =</span> sil_values[indices_negativos, <span class="st">"cluster"</span>],</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Vecino_Cercano =</span> sil_values[indices_negativos, <span class="st">"neighbor"</span>], <span class="co"># El cluster al que "quieren" ir</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Valor_Silueta =</span> sil_values[indices_negativos, <span class="st">"sil_width"</span>]</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(info_negativos)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  ClienteID Cluster_Asignado Vecino_Cercano Valor_Silueta
+1         5                1              2   -0.02425103
+2        43                2              3   -0.05441638
+3        44                1              4   -0.01059985
+4       135                6              4   -0.01934956
+5       147                6              3   -0.01341218</code></pre>
+</div>
+</div>
+<p>Por último, el valor promedio de la anchura de la silueta nos indica, globalmente, si los grupos están separados (valor cercano a 1) o los datos no están agrupados de forma natural (valores cercanos a 0).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sil_values)<span class="sc">$</span>avg.width</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4253104</code></pre>
+</div>
+</div>
+<p>Interpretación de los medoides (clientes prototipo).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraemos los clientes reales que son los centros de cada grupo</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>medoides_reales <span class="ot">&lt;-</span> datos_limpios[pam_res<span class="sc">$</span>id.med, ]</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos a qué cluster representan</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>medoides_reales<span class="sc">$</span>Cluster_Representado <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Los 'Clientes Arquetipo' (Medoides) de cada grupo son:"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Los 'Clientes Arquetipo' (Medoides) de cada grupo son:"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(medoides_reales)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  CustomerID Gender   Age Income SpendingScore Cluster_Representado
+       &lt;dbl&gt; &lt;fct&gt;  &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;                &lt;int&gt;
+1         22 Male      25  24000            73                    1
+2         35 Female    49  33000            14                    2
+3         81 Male      57  54000            51                    3
+4         98 Female    27  60000            50                    4
+5        176 Female    30  88000            86                    5
+6        167 Male      42  86000            20                    6</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="ejemplo-de-reducc.-dim." class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="ejemplo-de-reducc.-dim."><span class="header-section-number">8.2</span> Ejemplo de reducc. dim.</h2>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

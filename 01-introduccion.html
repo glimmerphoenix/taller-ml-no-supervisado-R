@@ -20,7 +20,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -69,6 +89,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -287,7 +336,7 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Existen muchas definiciones complementarias sobre la Inteligencia Artificial (IA), cada una reflejo de un modo diferente de aproximarse al complejo problema de crear máquinas que puedan imitar la inteligencia humana <span class="citation" data-cites="russell2010">(<a href="references.html#ref-russell2010" role="doc-biblioref"><strong>russell2010?</strong></a>)</span>. Por ejemplo, en el artículo de Wikipedia sobre IA se define de la siguiente forma <a href="https://es.wikipedia.org/wiki/Inteligencia_artificial">enlace</a>:</p>
+<p>Existen muchas definiciones complementarias sobre la Inteligencia Artificial (IA), cada una reflejo de un modo diferente de aproximarse al complejo problema de crear máquinas que puedan imitar la inteligencia humana <span class="citation" data-cites="russell2010">(<a href="references.html#ref-russell2010" role="doc-biblioref">Russell &amp; Norvig, 2009</a>)</span>. Por ejemplo, en el artículo de Wikipedia sobre IA se define de la siguiente forma <a href="https://es.wikipedia.org/wiki/Inteligencia_artificial">enlace</a>:</p>
 <blockquote class="blockquote">
 <p>La inteligencia artificial, abreviado como IA, en el contexto de las ciencias de la computación, es una disciplina y un conjunto de capacidades cognoscitivas e intelectuales expresadas por sistemas informáticos o combinaciones de algoritmos cuyo propósito es la creación de máquinas que imiten la inteligencia humana.</p>
 </blockquote>
@@ -303,7 +352,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Por tanto, vemos que el <strong>aprendizaje automático</strong> (<em>machine learning</em> o ML en inglés) es una rama de la IA que tiene por objetivo el desarrollo de técnicas y métodos para que las computadoras aprendan. Un <strong>agente</strong> inteligente aprende cuando es capaz de mejorar su rendimiento a partir de la experiencia y de la información extraída de datos.</p>
 <section id="tipos-de-aprendizaje-automático" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="tipos-de-aprendizaje-automático"><span class="header-section-number">1.1</span> Tipos de aprendizaje automático</h2>
-<p>Existe una taxonomía ampliamente aceptada para clasificar las diferentes aproximaciones para resolver el problema del aprendizaje automático <span class="citation" data-cites="russell2010">(<a href="references.html#ref-russell2010" role="doc-biblioref"><strong>russell2010?</strong></a>)</span>:</p>
+<p>Existe una taxonomía ampliamente aceptada para clasificar las diferentes aproximaciones para resolver el problema del aprendizaje automático <span class="citation" data-cites="russell2010">(<a href="references.html#ref-russell2010" role="doc-biblioref">Russell &amp; Norvig, 2009</a>)</span>:</p>
 <ul>
 <li><strong>Aprendizaje supervisado</strong>: el agente observa algunos ejemplos de parejas de valores entrada-salida y aprende una función que mapea nuevas entradas a nuevos valores de salida.</li>
 <li><strong>Aprendizaje no supervisado</strong>: el agente debe descubrir patrones o similitudes entre los valores de entrada aunque no se le haya facilitado ningún tipo de información adicional.</li>
@@ -315,11 +364,196 @@ ul.task-list li input[type="checkbox"] {
 <h2 data-number="1.2" class="anchored" data-anchor-id="tareas-de-aprendizaje-automático-no-supervisado"><span class="header-section-number">1.2</span> Tareas de aprendizaje automático no supervisado</h2>
 <section id="clustering" class="level3" data-number="1.2.1">
 <h3 data-number="1.2.1" class="anchored" data-anchor-id="clustering"><span class="header-section-number">1.2.1</span> Clustering</h3>
+<p>El agrupamiento o <em>clustering</em> es una tarea que tiene por objetivo agrupar los datos en función del grado de <strong>similaridad</strong> (semejanza) que existe entre los elementos de un <em>dataset</em>. Por lo tanto, lo primero que debemos hacer es definir qué es una función de similaridad y su relación con la función de distancia.</p>
+<p>Consideremos un conjunto <span class="math inline">\(\mathcal{X}\)</span> de <span class="math inline">\(n\)</span> elementos, descritos por una serie de <span class="math inline">\(d\)</span> variables, <span class="math inline">\(\{x_1, x_2,\dots, x_d \}\)</span>. Suponiendo que todas esas variables se pueden expresar mediante valores numéricos reales, cada elemento del conjunto <span class="math inline">\(\mathcal{X}\)</span> quedaría pues representado en un espacio <span class="math inline">\(\mathbb{R}^d\)</span>. Una <strong>función de similaridad</strong> es una aplicación <span class="math inline">\(s: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}\)</span> que cumple estas propiedades para tres elementos <span class="math inline">\(A, B\)</span> y <span class="math inline">\(C\)</span> de <span class="math inline">\(\mathcal{X}\)</span> <span class="citation" data-cites="xu2009clustering">(<a href="references.html#ref-xu2009clustering" role="doc-biblioref">Xu &amp; II, 2009</a>)</span>:</p>
+<ol type="1">
+<li><em>Positividad</em>: <span class="math inline">\(0 \leq s(A,B) \leq 1,\; \forall A,B\)</span>.</li>
+<li><em>Simetría</em>: <span class="math inline">\(s(A,B) = s(B,A)\)</span>.</li>
+</ol>
+<p>Si además cumple las siguientes propiedades:</p>
+<ol start="3" type="1">
+<li><span class="math inline">\(s(A,B)S(B,C) \leq \[S(A,B)+S(B,C)\]S(A,C)\)</span>;</li>
+<li><em>Reflexividad</em>: <span class="math inline">\(S(A,B)=1 \Leftrightarrow A=B\)</span>,</li>
+</ol>
+<p>entonces se denomina <strong>métrica de similaridad</strong>.</p>
+<p>Por tanto, la similaridad cuantifica cómo de parecidos son dos elementos de un conjunto de datos, según los valores de las variables que los describen. Existen definiciones análogas para determinar las propiedades de una función de similaridad con otros tipos de variables (por ejemplo, categóricas u ordinales). La noción opuesta a la expresada por la <strong>similaridad</strong> es la <strong>disimilaridad</strong>, que cuantifica lo alejados o diferentes que son dos elementos de <span class="math inline">\(\mathcal{X}\)</span> entre sí. Es sencillo obtener una función de disimilaridad a partir de la función de similaridad, puesto que está normalizada.</p>
+<p>Si denotamos la <strong>función de disimilaridad</strong> como <span class="math inline">\(\delta(A,B)\)</span> esta se puede obtener como:</p>
+<p><span class="math display">\[
+\delta(A,B) = 1 - S(A,B).
+\]</span></p>
+<p>Una <strong>función de distancia</strong>, que podemos denotar como <span class="math inline">\(DdA,B)\)</span> mide también lo distintos que son entre sí una pareja de elementos <span class="math inline">\((A,B)\)</span> de <span class="math inline">\(\mathcal{X}\)</span>. En el caso de las <strong>distancias métricas</strong>, éstas cumplen cuatro propiedades de los espacios métricos <span class="citation" data-cites="skopal2007">(<a href="references.html#ref-skopal2007" role="doc-biblioref">Skopal, 2007</a>)</span>:</p>
+<ul>
+<li><em>Reflexividad</em>: <span class="math inline">\(d(A,B) = 0 \Leftrightarrow A = B\)</span>.</li>
+<li><em>No negatividad</em>: <span class="math inline">\(d(A,B) &gt; 0 \Leftrightarrow A \neq B\)</span>.</li>
+<li><em>Simetría</em>: <span class="math inline">\(d(A,B) = D(B,A)\)</span>.</li>
+<li><em>Desigualdad triangular</em>: <span class="math inline">\(d(A,B) + d(B,C) \geq d(A,C)\)</span>.</li>
+</ul>
+<p>En lo sucesivo, vamos a circunscribir nuestra descripción a las distancias <em>métricas</em>, puesto que se utilizan en un gran número de problemas prácticos y simplificarán muchas consideraciones que haremos respecto de los algoritmos de <em>clustering</em> que vamos a tratar. Por ejemplo, una familia de distancias ampliamente conocida es la representada por la <strong>distancia Minkowski</strong> de <em>orden</em> <span class="math inline">\(p &gt; 0\)</span>, que se define como:</p>
+<p><span id="eq-mink-dist"><span class="math display">\[
+d_{Mink}(A,B) = \left( \sum_{j=1}^d |x_{Aj}-x_{Bj}|^p \right)^{1/p},
+\tag{1.1}\]</span></span></p>
+<p>siendo <span class="math inline">\(\|A\|_p = \left( \sum_{j=1}^d |x_{Aj}|^p \right)^{1/p}\)</span> la <em>norma</em> <span class="math inline">\(p* (denotada muchas veces como\)</span>L_p$) del vector A. Así, para <span class="math inline">\(p=1\)</span> tenemos la <em>distancia Manhattan</em> (<span class="math inline">\(L_1\)</span>), mientras que para <span class="math inline">\(p=2\)</span> tenemos la popular <em>distancia Euclídea</em> (<span class="math inline">\(L_2\)</span>).</p>
+<p>Se denomina <strong>matriz de distancias</strong> a una matriz <span class="math inline">\(D=(d_{E_{i}E_{j}});\, i,j=1,\dots,n\)</span> que contiene todas las distancias entre cada par de elementos <span class="math inline">\((E_i,E_j)\)</span> de <span class="math inline">\(\mathcal{X}\)</span>. Siempre que la función de distancia utilizada cumpla la propiedad de <em>simetría</em>, esta matriz será <em>triangular</em>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Distancias no métricas
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Aunque es muy habitual utilizar distancias <em>métricas</em> en los problemas de <em>clustering</em> y de búsqueda por similaridad, también existen muchas funciones de distancia de gran utilidad en muchos problemas que no cumplen las cuatro propiedades enunciadas <span class="citation" data-cites="skopal2007">(<a href="references.html#ref-skopal2007" role="doc-biblioref">Skopal, 2007</a>)</span>. Por ejemplo, las <em>semimétricas</em> son distancias que no cumplen la cuarta propiedad de desigualdad triangular. Por otro lado, las <em>pseudométricas</em> no satisfacen la reflexividad. Por último, las <em>cuasimétricas</em> no satisfacen la simetría.</p>
+</div>
+</div>
+<section id="algunas-funciones-de-distancia" class="level4" data-number="1.2.1.1">
+<h4 data-number="1.2.1.1" class="anchored" data-anchor-id="algunas-funciones-de-distancia"><span class="header-section-number">1.2.1.1</span> Algunas funciones de distancia</h4>
+<p>La <a href="#tbl-distance-funcs" class="quarto-xref">Tabla&nbsp;<span>1.1</span></a> resume información básica sobre algunas funciones de distancia comúnmente empleadas.</p>
+<div id="tbl-distance-funcs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-distance-funcs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;1.1: Algunas funciones de distancia muy frecuentes.
+</figcaption>
+<div aria-describedby="tbl-distance-funcs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 17%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Función distancia</th>
+<th style="text-align: center;">Es métrica</th>
+<th style="text-align: left;">Aplicaciones</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Manhattan (<em>city block</em>)</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: left;">Multiples: análisis de imagen, tiempos de viaje</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Euclídea</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: left;">Una de las funciones más utilizadas</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Minkowski</td>
+<td style="text-align: center;">Sí, <span class="math inline">\(p\geq1\)</span></td>
+<td style="text-align: left;">Generalización de funciones de disancia básicas</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mahalanobis</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: left;">Comparación entre distribuciones de valores</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Similaridad del coseno</td>
+<td style="text-align: center;">No(*)</td>
+<td style="text-align: left;">Agrupamiento y comparación de documentos</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jaccard</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: left;">Datos binarios en ecología, genómica, etc.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>(*): Se puede efectuar una trasnformación a una distancia “comparable” que sí cumple las propiedades de métrica.</p>
+</section>
+<section id="tipos-de-clustering" class="level4" data-number="1.2.1.2">
+<h4 data-number="1.2.1.2" class="anchored" data-anchor-id="tipos-de-clustering"><span class="header-section-number">1.2.1.2</span> Tipos de clustering</h4>
+<p>En general, las estrategias de aprendizaje no supervisado para clustering se pueden clasificar en dos grandes grupos, cuyo enfoque conceptual se ilustra en la <a href="#fig-types-clustering" class="quarto-xref">Figura&nbsp;<span>1.1</span></a>.</p>
+<div id="fig-types-clustering" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-types-clustering-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/types-clustering.png" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-types-clustering-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;1.1: Ilustración de los dos posibles tipos de algoritmos de clustering: (izq.) jerárquico; (dcha.) no jerárquico o partitivo. Fuente: Figura 12.2 de <span class="citation" data-cites="nwanganga2020">(<a href="references.html#ref-nwanganga2020" role="doc-biblioref">Nwanganga &amp; Chapple, 2020</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<ul>
+<li><p><strong>Clustering jerárquico</strong>: en este enfoque, el algoritmo genera grupos de elementos que están contenidos unos dentro de los otros. Por lo tanto, los límites de un agrupamiento pueden estar dentro de los límites de otra agrupación de mayor nivel, creando una jerarquía de relaciones padre-hijo entre los <em>clústeres</em>. Esta relación se suele representar gráficamente por medio de un diagrama de árbol que se denomina <strong>dendograma</strong>.</p></li>
+<li><p><strong>Clustering no jerárquico</strong> (<em>partitional</em>): la estrategia de este tipo de algoritmos consiste en particionar el espacio de representación de un cierto número de grupos, siendo uno de los objetivos conseguir que no exista solape entre los grupos identificados y, por tanto, cada grupo es independiente del resto.</p></li>
+</ul>
+<p>Por ejemplo, la <a href="#fig-voronoi-tess" class="quarto-xref">Figura&nbsp;<span>1.2</span></a> muestra las regiones determinadas por un algoritmo no jerárquico como <em>k</em>-means cuando divide el espacio de representación (asumimos que bidimensional) en varias regiones, asignando un punto representativo o <em>centroide</em> a cada región.</p>
+<div id="fig-voronoi-tess" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-voronoi-tess-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/Euclidean_Voronoi_diagram.svg.png" class="img-fluid figure-img" style="width:60.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-voronoi-tess-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;1.2: Ilustración de un diagrama o <em>tesela</em> de Voronoi, usando la distancia Euclídea. Fuente: Wikipedia.
+</figcaption>
+</figure>
+</div>
+<p>Por último, tenemos otra taxonomía de algoritmos de <em>clustering</em> en función de si los agrupamientos pueden o no tener solapes entre sí, como muestra la <a href="#fig-types-clustering-overlap" class="quarto-xref">Figura&nbsp;<span>1.3</span></a>.</p>
+<div id="fig-types-clustering-overlap" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-types-clustering-overlap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/types-clustering-overlapping.png" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-types-clustering-overlap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;1.3: Ilustración de dos posibles tipos de algoritmos de clustering: (izq.) con solape entre grupos; (dcha.) sin solape entre grupos. Fuente: Figura 12.3 de <span class="citation" data-cites="nwanganga2020">(<a href="references.html#ref-nwanganga2020" role="doc-biblioref">Nwanganga &amp; Chapple, 2020</a>)</span>.
+</figcaption>
+</figure>
+</div>
+</section>
 </section>
 <section id="reducción-de-dimensionalidad" class="level3" data-number="1.2.2">
 <h3 data-number="1.2.2" class="anchored" data-anchor-id="reducción-de-dimensionalidad"><span class="header-section-number">1.2.2</span> Reducción de dimensionalidad</h3>
+<p>Otra tarea muy habitual en el aprendizaje automático no supervisado es la de expresar un conjunto de datos de manera más eficiente, reduciendo el número de variables que se emplean para describir sus elementos. Para ello, se busca identificar un conjunto más pequeño de variables, que se suelen denominar <em>componentes principales</em> o <em>variables latentes</em>. Estas nuevas variables deben ser capaces de capturar la misma cantidad de información sobre los elementos de nuestro conjunto de datos pero en un espacio de representación con muchas menos dimensiones.</p>
+<p>Consideremos el <a href="https://es.wikipedia.org/wiki/Base_de_datos_MNIST">dataset MNIST</a>, que contiene 60.000 imágenes de entrenamiento y 10.000 imágenes de prueba, cada una de ellas con información sobre imágenes de dígitos manuscritos sobre una malla de 28x28 píxeles. Por tanto, cada elemento de este dataset está representado por 784 variables (una por cada pixel). La <a href="#fig-mnist-digits" class="quarto-xref">Figura&nbsp;<span>1.4</span></a> muestra algunos ejemplos de estas cifras manuscritas incluidas en el <em>dataset</em>.</p>
+<div id="fig-mnist-digits" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mnist-digits-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/MNIST-digits.png" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mnist-digits-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;1.4: Ejemplos de algunos de los dígitos manuscritos incluidos en el dataset MNIST.
+</figcaption>
+</figure>
+</div>
+<p>Sería muy complicado conseguir la representación gráfica de todos estos elementos para detectar las imágenes de dígitos que son parecidas entre sí (por ejemplo, un grupo con los números <code>4</code>, otro con los números <code>8</code>, etc.). Las técnicas de reducción de dimensionalidad nos permiten proyectar la representación original de estos datos en un espacio <span class="math inline">\(\mathbb{R}^784\)</span> sobre un espacio <span class="math inline">\(\mathbb{R}^2\)</span>, que sí podemos representar gráficamente.</p>
+<p>Por ejemplo, la <a href="#fig-mnist-tsne" class="quarto-xref">Figura&nbsp;<span>1.5</span></a> muestra una representación gráfica en 2D de una muestra aleatoria de elementos de MNIST, en la que previamente se han reducido las 784 dimensiones originales a 2 mediante el algoritmo t-SNE <span class="citation" data-cites="maaten2008visualizing">(<a href="references.html#ref-maaten2008visualizing" role="doc-biblioref">Maaten &amp; Hinton, 2008</a>)</span>.</p>
+<div id="fig-mnist-tsne" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mnist-tsne-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/MNIST-tSNE.png" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mnist-tsne-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;1.5: Representación gráfica de la proyección 2D de una muestra de elementos del conjunto de datos MNIST, obtenida mediante el algoritmo t-SNE <span class="citation" data-cites="maaten2008visualizing">(<a href="references.html#ref-maaten2008visualizing" role="doc-biblioref">Maaten &amp; Hinton, 2008</a>)</span>. Fuente: elaboración propia.
+</figcaption>
+</figure>
+</div>
+<p>Veremos que una limitación importante de estos algoritmos consiste en que las variables que obtenemos tras la reducción de las dimensiones originales no son, en muchos casos, fácilmente interpretables.</p>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
+<div id="ref-maaten2008visualizing" class="csl-entry" role="listitem">
+Maaten, L. van der, &amp; Hinton, G. (2008). Visualizing data using t-SNE. <em>Journal of machine learning research</em>, <em>9</em>(Nov), 2579-2605.
+</div>
+<div id="ref-nwanganga2020" class="csl-entry" role="listitem">
+Nwanganga, F., &amp; Chapple, M. (2020). <em>Practical Machine Learning in R</em> (1.ª ed.). John Wiley &amp; Sons, Inc. <a href="https://www.wiley.com/en-us/Practical+Machine+Learning+in+R-p-9781119591535">https://www.wiley.com/en-us/Practical+Machine+Learning+in+R-p-9781119591535</a>
+</div>
+<div id="ref-russell2010" class="csl-entry" role="listitem">
+Russell, S., &amp; Norvig, P. (2009). <em>Artificial Intelligence: A Modern Approach</em> (3.ª ed.). Prentice Hall Press.
+</div>
+<div id="ref-skopal2007" class="csl-entry" role="listitem">
+Skopal, T. (2007). Unified framework for fast exact and approximate search in dissimilarity spaces. <em><span>ACM</span> Transactions on Database Systems</em>, <em>32</em>(4), 29. <a href="https://doi.org/10.1145/1292609.1292619">https://doi.org/10.1145/1292609.1292619</a>
+</div>
+<div id="ref-xu2009clustering" class="csl-entry" role="listitem">
+Xu, R., &amp; II, D. C. W. (2009). <em><span>Clustering</span></em>. Wiley-IEEE Press. <a href="https://ieeexplore.ieee.org/book/5236612">https://ieeexplore.ieee.org/book/5236612</a>
+</div>
+</div>
 </section>
 </section>
 
