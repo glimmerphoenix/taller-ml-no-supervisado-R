@@ -1,5 +1,134 @@
 # Clustering jerárquico
 
+## AGNES
+
+Veamos un ejemplo con el dataset `USArrests`. La función `cluster::agnes` implementa este algoritmo en R.
+También usaremos las funciones de utilidad del paquete `factoextra` para representación gráfica y 
+comparación de alternativas de agrupamiento utilizando métricas de evaluación del resultado.
+
+```{r}
+#| label: agnes-data-pkgs
+#| message: false
+
+library(cluster)
+library(factoextra)
+library(tidyverse)
+df <- USArrests
+
+# eliminamos valores faltantes
+df <- na.omit(df)
+
+# escalamos las variables
+df <- scale(df)
+
+head(df)
+```
+
+La función que implementa el algoritmo AGNES en R es `agnes` (ninguna sorpresa). Uno de sus resultados
+es el campo `ac`, que mide el coeficiente aglomerativo del resultado. Éste cuantifica la cantidad de
+estructura de agrupaciones que se ha encontrado (mejores valores cercanos a 1).
+
+```{r}
+# Clustering jerárquico (enlace completo)
+hc2 <- agnes(df, method = "complete" )
+hc2$ac
+```
+
+Comparemos diferentes métodos de conexión para el agrupamiento jerárquico.
+
+```{r}
+# Métodos evaluados
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+
+# Función para calcular el coeficiente de agrupamiento
+ac <- function(x) {
+  agnes(df, method = x)$ac
+}
+map_dbl(m, ac)
+```
+
+El siguiente dendograma utiliza un método de enlazado completo.
+
+```{r}
+#| label: fig-agnes-dendogram-comp
+#| fig-cap: ""
+
+# Matriz de disimilaridades
+d <- dist(df, method = "euclidean")
+
+# Clustering jerárquico usando enlace completo
+hc1 <- hclust(d, method = "complete" )
+
+# Dendrograma
+plot(hc1, cex = 0.6, hang = -1)
+```
+
+Sin embargo, si cambiamos al método de enlazado de Ward obtenemos resultados diferentes.
+
+```{r}
+#| label: fig-agnes-dendogram-ward
+#| fig-cap: ""
+
+hc2 <- agnes(df, method = "ward" )
+
+# Drendrograma
+pltree(hc2, cex = 0.6, hang = -1, main = "Dendrograma de AGNES (método Ward)") 
+```
+
+En función de a qué altura cortemos el árbol, obtenemos diferentes agrupamientos.
+
+```{r}
+#| label: fig-agnes-dendogram-ward-cut
+#| fig-cap: ""
+
+# Método de Ward
+hc5 <- hclust(d, method = "ward.D2" )
+
+# Cortamos en 4 clusters
+sub_grp <- cutree(hc5, k = 4)
+
+# Visualizamos el corte en el dendrograma
+plot(hc5, cex = 0.6)
+rect.hclust(hc5, k = 4, border = 2:5)
+```
+
+Podemos ver el número de observaciones en cada grupo.
+
+```{r}
+table(sub_grp)
+```
+
+También se puede representar gráficamente el resultado, ya que la función `fviz_cluster` acepta este
+tipo de objetos.
+
+```{r}
+#| label: fig-agnes-dendogram-ward-plot
+#| fig-cap: ""
+
+fviz_cluster(list(data=df,cluster=sub_grp))
+```
+
+Además, podemos usar `fviz_nbclust` para utilizar un método de evaluación de los agrupamientos obtenidos
+con diferentes valores de grupos, y así decidir la mejor opción de configuración (en este caso, a qué altura
+cortamos el árbol). En el siguiente ejemplo se usa la WCSS.
+
+```{r}
+#| label: fig-agnes-dendogram-ward-eval-wss
+#| fig-cap: ""
+
+fviz_nbclust(df, FUN = hcut, method = "wss")
+```
+
+O también el método de la silueta. Métodos diferentes de evaluación pueden arrojar conclusiones distintas.
+
+```{r}
+#| label: fig-agnes-dendogram-ward-eval-silh
+#| fig-cap: ""
+
+fviz_nbclust(df, FUN = hcut, method = "silhouette")
+```
+
 ## DBSCAN
 
 ### Ejemplo básico con R
