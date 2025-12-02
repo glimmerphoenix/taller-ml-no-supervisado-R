@@ -215,6 +215,8 @@ fviz_cluster(pam_res,
 Evaluación de la calidad del agrupamiento mediante el gráfico de Silueta.
 
 ```{r}
+#| label: pam-silhouette-viz
+#| warning: false
 
 # Visualización detallada de la Silueta
 grafico_silueta <- fviz_silhouette(pam_res, palette = "jco", print.summary = FALSE)
@@ -275,4 +277,6 @@ print(medoides_reales)
 ```
 
 ## Ejemplo de reducc. dim.
+
+
 
