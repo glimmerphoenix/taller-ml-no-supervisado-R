@@ -1,11 +1,217 @@
 # Reducción de la dimensionalidad
 
-Ejemplos de algoritmos de cada clase
+Ejemplos de algoritmos de cada clase.
 
 ## PCA
+
+Utilizaremos el dataset estándar `USArrests` que proporciona R. Seguiremos el ejemplo del 
+laboratorio del Capítulo 12 de [@james2021] (Sec. 12.5.1).
+
+```{r}
+#| label: pca-start
+
+## Principal Components Analysis
+states <- row.names(USArrests)
+states
+names(USArrests)
+
+## Computamos la media y la varianza de las columnas
+apply(USArrests, 2, mean)
+apply(USArrests, 2, var)
+
+## Calculamos las componentes principales mediante la función `prcomp`
+pr.out <- prcomp(USArrests, scale = TRUE)
+names(pr.out)
+```
+
+Las variables `center` y `scale` corresponden a la media y desviación estándar de las variables
+que se emplearon para el escalado, antes de la transformación. Además, la matriz `rotation`
+contiene los pesos de las componentes principales calculadas.
+
+```{r}
+pr.out$center
+pr.out$scale
+pr.out$rotation
+###
+dim(pr.out$x)
+```
+
+Representamos un diagrama con las dos primeras componentes principales
+
+```{r}
+#| label: fig-biplot-pca
+#| fig-cap: ""
+
+###
+biplot(pr.out, scale = 0)
+```
+
+Debemos corregir el signo de las componentes principales para que el gráfico se vea
+mejor.
+
+```{r}
+#| label: fig-biplot-pca-fix
+#| fig-cap: ""
+
+###
+pr.out$rotation = -pr.out$rotation
+pr.out$x = -pr.out$x
+biplot(pr.out, scale = 0)
+```
+
+Podemos calcular también el porcentaje de varianza explicada.
+
+```{r}
+#| label: pca-var-explained
+
+###
+pr.out$sdev
+###
+pr.var <- pr.out$sdev^2
+pr.var
+###
+pve <- pr.var / sum(pr.var)
+pve
+```
+
+Podemos representar gráficamente este porcentaje para cada componente, así como el PVE acumulado.
+
+```{r}
+#| label: fig-pve
+#| fig-cap: ""
+
+par(mfrow = c(1, 2))
+plot(pve, xlab = "Principal Component",
+    ylab = "Proportion of Variance Explained", ylim = c(0, 1),
+    type = "b")
+plot(cumsum(pve), xlab = "Principal Component",
+    ylab = "Cumulative Proportion of Variance Explained",
+    ylim = c(0, 1), type = "b")
+```
 
 
 ### t-SNE
 
+El paquete `Rtsne` implementa este algoritmo de reducción de dimensionalidad en R.
+
+```{r}
+# Instalar y cargar librerías necesarias
+# install.packages("Rtsne")
+# install.packages("ggplot2")
+library(Rtsne)
+library(ggplot2)
+
+# Cargar y preparar los datos
+data("USArrests")
+
+# t-SNE falla si hay filas duplicadas. Aunque USArrests no suele tenerlos,
+# es una buena práctica comprobarlo
+df_unique <- unique(USArrests)
+
+# t-SNE se basa en distancias. Si una variable tiene valores de 1000 y otra de 1,
+# la primera dominará el cálculo. La función 'scale' normaliza los valores para que
+# todas las variables queden en rangos comparables
+
+df_scaled <- scale(df_unique)
+
+# Ejemcutamos el algoritmo t-SNE
+set.seed(42) # reproducible
+
+# El parámetro 'perplexity' controla el "número efectivo de vecinos".
+# Normalmente se usa 30, pero como USArrests es muy pequeño (50 datos),
+# debemos bajarlo (el máximo recomendado suele ser (N-1)/3).
+# Le asignamos un valor de 10.
+tsne_results <- Rtsne(df_scaled, 
+                      dims = 2,            # Queremos proyectar a 2 dimensiones
+                      perplexity = 10,     # Ajustado por el tamaño pequeño del dataset
+                      verbose = TRUE, 
+                      max_iter = 1000)
+
+# Etraemos las coordenadas generadas para repres. gráfica
+tsne_plot_data <- data.frame(
+  X = tsne_results$Y[, 1],
+  Y = tsne_results$Y[, 2],
+  State = rownames(df_unique) # Nombres de los estados
+)
+```
+
+```{r}
+#| label: fig-Rtsne
+#| fig-cap: ""
+
+# Visualización con ggplot2
+ggplot(tsne_plot_data, aes(x = X, y = Y)) +
+  geom_point(color = "steelblue", size = 3, alpha = 0.8) +
+  geom_text(aes(label = State), vjust = 1.5, size = 3) + # Etiquetas de estados
+  theme_minimal() +
+  labs(
+    title = "Visualización t-SNE de USArrests",
+    subtitle = "Estados agrupados por similitud en tasas de crimen",
+    x = "Dimensión t-SNE 1",
+    y = "Dimensión t-SNE 2"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
 
 ### UMAP
+
+El paquete `umap` en R implementa este algoritmo.
+
+```{r}
+#| label: fig-umap
+#| fig-cap: ""
+
+# Instalar y cargar librerías
+# install.packages("umap")
+# install.packages("ggplot2")
+library(umap)
+library(ggplot2)
+
+# Cargar y preparar los datos
+data("USArrests")
+
+# UMAP, como t-SNE, se basa en distancias, por lo que es recomendable
+# escalar los valores de las variables
+df_scaled <- scale(USArrests)
+
+# Definir y ejecutar el algoritmo UMAP
+set.seed(42) # Para reproducibilidad
+
+# Definimos una configuración específica para datasets pequeños como USArrests (N=50)
+custom_umap_config <- umap.defaults
+custom_umap_config$n_neighbors <- 5  # El valor por defecto es 15, pero 5 o 10 es mejor para N=50
+custom_umap_config$min_dist <- 0.1   # Distancia mínima entre puntos proyectados
+custom_umap_config$random_state <- 42 # Semilla
+
+# Ejecutar UMAP
+umap_results <- umap(df_scaled, config = custom_umap_config)
+
+# 4. Preparar datos para graficar
+# UMAP devuelve el resultado en el slot 'layout'
+umap_plot_data <- data.frame(
+  X = umap_results$layout[, 1],
+  Y = umap_results$layout[, 2],
+  State = rownames(USArrests)
+)
+
+# 5. Visualización con ggplot2
+ggplot(umap_plot_data, aes(x = X, y = Y)) +
+  geom_point(color = "darkred", size = 3, alpha = 0.8) +
+  geom_text(aes(label = State), vjust = 1.5, size = 3) + 
+  theme_bw() +
+  labs(
+    title = "Visualización UMAP de USArrests",
+    subtitle = "Los ejes representan las dos dimensiones principales de UMAP",
+    x = "Dimensión UMAP 1",
+    y = "Dimensión UMAP 2"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+Al igual que con t-SNE, los estados que se agrupan en el gráfico UMAP tienen perfiles criminales 
+muy similares (por ejemplo, los estados del Sur con altas tasas de crímenes violentos a menudo se 
+agrupan en una región, mientras que los estados más seguros se agrupan en otra). La ventaja de 
+UMAP es que la distancia entre estos grupos de clústeres a menudo se interpreta como una representación 
+más fiel de la distancia global que la que proporciona t-SNE.
