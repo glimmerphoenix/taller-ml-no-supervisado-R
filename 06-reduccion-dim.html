@@ -310,7 +310,7 @@ div.csl-indent {
     <h2 id="toc-title">Tabla de contenidos</h2>
    
   <ul>
-  <li><a href="#pca" id="toc-pca" class="nav-link active" data-scroll-target="#pca"><span class="header-section-number">6.1</span> PCA</a>
+  <li><a href="#sec-pca-usarrests" id="toc-sec-pca-usarrests" class="nav-link active" data-scroll-target="#sec-pca-usarrests"><span class="header-section-number">6.1</span> PCA</a>
   <ul class="collapse">
   <li><a href="#t-sne" id="toc-t-sne" class="nav-link" data-scroll-target="#t-sne"><span class="header-section-number">6.1.1</span> t-SNE</a></li>
   <li><a href="#umap" id="toc-umap" class="nav-link" data-scroll-target="#umap"><span class="header-section-number">6.1.2</span> UMAP</a></li>
@@ -341,8 +341,8 @@ div.csl-indent {
 
 
 <p>Ejemplos de algoritmos de cada clase.</p>
-<section id="pca" class="level2" data-number="6.1">
-<h2 data-number="6.1" class="anchored" data-anchor-id="pca"><span class="header-section-number">6.1</span> PCA</h2>
+<section id="sec-pca-usarrests" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="sec-pca-usarrests"><span class="header-section-number">6.1</span> PCA</h2>
 <p>Utilizaremos el dataset estándar <code>USArrests</code> que proporciona R. Seguiremos el ejemplo del laboratorio del Capítulo 12 de <span class="citation" data-cites="james2021">(<a href="references.html#ref-james2021" role="doc-biblioref">James, 2021</a>)</span> (Sec. 12.5.1).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Principal Components Analysis</span></span>
@@ -553,7 +553,7 @@ Iteration 850: error is 0.240463 (50 iterations in 0.00 seconds)
 Iteration 900: error is 0.234624 (50 iterations in 0.00 seconds)
 Iteration 950: error is 0.230820 (50 iterations in 0.00 seconds)
 Iteration 1000: error is 0.237176 (50 iterations in 0.00 seconds)
-Fitting performed in 0.06 seconds.</code></pre>
+Fitting performed in 0.05 seconds.</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Etraemos las coordenadas generadas para repres. gráfica</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>tsne_plot_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>

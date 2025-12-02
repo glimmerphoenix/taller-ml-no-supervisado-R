@@ -322,7 +322,7 @@ window.Quarto = {
   <li><a href="#segmentación-de-clientes-de-un-centro-comercial" id="toc-segmentación-de-clientes-de-un-centro-comercial" class="nav-link active" data-scroll-target="#segmentación-de-clientes-de-un-centro-comercial"><span class="header-section-number">8.1</span> Segmentación de clientes de un centro comercial</a>
   <ul class="collapse">
   <li><a href="#resolución-con-k-means" id="toc-resolución-con-k-means" class="nav-link" data-scroll-target="#resolución-con-k-means"><span class="header-section-number">8.1.1</span> Resolución con <em>k</em>-means</a></li>
-  <li><a href="#resolución-con-pam-k-medoids" id="toc-resolución-con-pam-k-medoids" class="nav-link" data-scroll-target="#resolución-con-pam-k-medoids"><span class="header-section-number">8.1.2</span> Resolución con PAM (<em>k</em>-medoids)</a></li>
+  <li><a href="#sec-pam-case-study" id="toc-sec-pam-case-study" class="nav-link" data-scroll-target="#sec-pam-case-study"><span class="header-section-number">8.1.2</span> Resolución con PAM (<em>k</em>-medoids)</a></li>
   </ul></li>
   <li><a href="#ejemplo-de-reducc.-dim." id="toc-ejemplo-de-reducc.-dim." class="nav-link" data-scroll-target="#ejemplo-de-reducc.-dim."><span class="header-section-number">8.2</span> Ejemplo de reducc. dim.</a></li>
   </ul>
@@ -572,8 +572,8 @@ Figura&nbsp;8.2
 <li><em>Promedio</em>: ingresos medios y gasto medio.</li>
 </ol>
 </section>
-<section id="resolución-con-pam-k-medoids" class="level3" data-number="8.1.2">
-<h3 data-number="8.1.2" class="anchored" data-anchor-id="resolución-con-pam-k-medoids"><span class="header-section-number">8.1.2</span> Resolución con PAM (<em>k</em>-medoids)</h3>
+<section id="sec-pam-case-study" class="level3" data-number="8.1.2">
+<h3 data-number="8.1.2" class="anchored" data-anchor-id="sec-pam-case-study"><span class="header-section-number">8.1.2</span> Resolución con PAM (<em>k</em>-medoids)</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Cargar y limpiar datos</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/mallcustomers.csv"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -689,7 +689,7 @@ Figura&nbsp;8.3
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="08-apps_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="08-apps_files/figure-html/pam-silhouette-viz-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

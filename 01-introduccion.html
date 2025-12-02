@@ -392,7 +392,7 @@ window.Quarto = {
 <p><span id="eq-mink-dist"><span class="math display">\[
 d_{Mink}(A,B) = \left( \sum_{j=1}^d |x_{Aj}-x_{Bj}|^p \right)^{1/p},
 \tag{1.1}\]</span></span></p>
-<p>siendo <span class="math inline">\(\|A\|_p = \left( \sum_{j=1}^d |x_{Aj}|^p \right)^{1/p}\)</span> la <em>norma</em> <span class="math inline">\(p* (denotada muchas veces como\)</span>L_p$) del vector A. Así, para <span class="math inline">\(p=1\)</span> tenemos la <em>distancia Manhattan</em> (<span class="math inline">\(L_1\)</span>), mientras que para <span class="math inline">\(p=2\)</span> tenemos la popular <em>distancia Euclídea</em> (<span class="math inline">\(L_2\)</span>).</p>
+<p>siendo <span class="math inline">\(\|A\|_p = \left( \sum_{j=1}^d |x_{Aj}|^p \right)^{1/p}\)</span> la <em>norma</em> <span class="math inline">\(p\)</span>* (denotada muchas veces como <span class="math inline">\(L_p\)</span>) del vector A. Así, para <span class="math inline">\(p=1\)</span> tenemos la <em>distancia Manhattan</em> (<span class="math inline">\(L_1\)</span>), mientras que para <span class="math inline">\(p=2\)</span> tenemos la popular <em>distancia Euclídea</em> (<span class="math inline">\(L_2\)</span>).</p>
 <p>Se denomina <strong>matriz de distancias</strong> a una matriz <span class="math inline">\(D=(d_{E_{i}E_{j}});\, i,j=1,\dots,n\)</span> que contiene todas las distancias entre cada par de elementos <span class="math inline">\((E_i,E_j)\)</span> de <span class="math inline">\(\mathcal{X}\)</span>. Siempre que la función de distancia utilizada cumpla la propiedad de <em>simetría</em>, esta matriz será <em>triangular</em>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -465,7 +465,7 @@ Tabla&nbsp;1.1: Algunas funciones de distancia muy frecuentes.
 </div>
 </figure>
 </div>
-<p>(*): Se puede efectuar una trasnformación a una distancia “comparable” que sí cumple las propiedades de métrica.</p>
+<p>(*): Se puede efectuar una transformación a una distancia “comparable” que sí cumple las propiedades de métrica.</p>
 </section>
 <section id="tipos-de-clustering" class="level4" data-number="1.2.1.2">
 <h4 data-number="1.2.1.2" class="anchored" data-anchor-id="tipos-de-clustering"><span class="header-section-number">1.2.1.2</span> Tipos de clustering</h4>
@@ -522,7 +522,7 @@ Figura&nbsp;1.4: Ejemplos de algunos de los dígitos manuscritos incluidos en el
 </figcaption>
 </figure>
 </div>
-<p>Sería muy complicado conseguir la representación gráfica de todos estos elementos para detectar las imágenes de dígitos que son parecidas entre sí (por ejemplo, un grupo con los números <code>4</code>, otro con los números <code>8</code>, etc.). Las técnicas de reducción de dimensionalidad nos permiten proyectar la representación original de estos datos en un espacio <span class="math inline">\(\mathbb{R}^784\)</span> sobre un espacio <span class="math inline">\(\mathbb{R}^2\)</span>, que sí podemos representar gráficamente.</p>
+<p>Sería muy complicado conseguir la representación gráfica de todos estos elementos para detectar las imágenes de dígitos que son parecidas entre sí (por ejemplo, un grupo con los números <code>4</code>, otro con los números <code>8</code>, etc.). Las técnicas de reducción de dimensionalidad nos permiten proyectar la representación original de estos datos en un espacio <span class="math inline">\(\mathbb{R}^{784}\)</span> sobre un espacio <span class="math inline">\(\mathbb{R}^2\)</span>, que sí podemos representar gráficamente.</p>
 <p>Por ejemplo, la <a href="#fig-mnist-tsne" class="quarto-xref">Figura&nbsp;<span>1.5</span></a> muestra una representación gráfica en 2D de una muestra aleatoria de elementos de MNIST, en la que previamente se han reducido las 784 dimensiones originales a 2 mediante el algoritmo t-SNE <span class="citation" data-cites="maaten2008visualizing">(<a href="references.html#ref-maaten2008visualizing" role="doc-biblioref">Maaten &amp; Hinton, 2008</a>)</span>.</p>
 <div id="fig-mnist-tsne" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
