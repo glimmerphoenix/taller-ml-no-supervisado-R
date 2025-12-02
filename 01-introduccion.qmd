@@ -71,7 +71,7 @@ que cumple estas propiedades para tres elementos $A, B$ y $C$ de $\mathcal{X}$ [
 
 Si además cumple las siguientes propiedades:
 
-3. $s(A,B)S(B,C) \leq \[S(A,B)+S(B,C)\]S(A,C)$;
+3. $s(A,B)S(B,C) \leq [S(A,B)+S(B,C)]S(A,C)$;
 4. *Reflexividad*: $S(A,B)=1 \Leftrightarrow A=B$,
 
 entonces se denomina **métrica de similaridad**.
