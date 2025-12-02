@@ -309,6 +309,13 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#clustering-no-jerárquico" id="toc-clustering-no-jerárquico" class="nav-link" data-scroll-target="#clustering-no-jerárquico"><span class="header-section-number">2.1.1</span> Clustering no jerárquico</a></li>
   <li><a href="#clustering-jerárquico" id="toc-clustering-jerárquico" class="nav-link" data-scroll-target="#clustering-jerárquico"><span class="header-section-number">2.1.2</span> Clustering jerárquico</a></li>
+  <li><a href="#medidas-de-evaluación-en-clustering" id="toc-medidas-de-evaluación-en-clustering" class="nav-link" data-scroll-target="#medidas-de-evaluación-en-clustering"><span class="header-section-number">2.1.3</span> Medidas de evaluación en clustering</a></li>
+  </ul></li>
+  <li><a href="#reducción-de-la-dimensionalidad" id="toc-reducción-de-la-dimensionalidad" class="nav-link" data-scroll-target="#reducción-de-la-dimensionalidad"><span class="header-section-number">2.2</span> Reducción de la dimensionalidad</a>
+  <ul class="collapse">
+  <li><a href="#análisis-de-componentes-principales-pca" id="toc-análisis-de-componentes-principales-pca" class="nav-link" data-scroll-target="#análisis-de-componentes-principales-pca"><span class="header-section-number">2.2.1</span> Análisis de componentes principales (PCA)</a></li>
+  <li><a href="#t-distributed-stochastic-neighbor-embedding-t-sne" id="toc-t-distributed-stochastic-neighbor-embedding-t-sne" class="nav-link" data-scroll-target="#t-distributed-stochastic-neighbor-embedding-t-sne"><span class="header-section-number">2.2.2</span> t-distributed Stochastic Neighbor Embedding (t-SNE)</a></li>
+  <li><a href="#uniform-manifold-approximation-and-projection-umap" id="toc-uniform-manifold-approximation-and-projection-umap" class="nav-link" data-scroll-target="#uniform-manifold-approximation-and-projection-umap"><span class="header-section-number">2.2.3</span> Uniform Manifold Approximation and Projection (UMAP)</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -478,6 +485,44 @@ Figura&nbsp;2.5: Tres dendogramas que muestran diferentes cortes a distinto nive
 <li><p><em>Método de Ward</em>: minimizar la suma de las diferencias cuadráticas dentro de los clusteres. De ese modo, se minimiza la varianza total del conglomerado.</p></li>
 <li><p><em>Enlace de centroides</em>: se calcula la distancia entre el centroide del grupo A y el centroide del grupo B.</p></li>
 </ul>
+</section>
+</section>
+<section id="medidas-de-evaluación-en-clustering" class="level3" data-number="2.1.3">
+<h3 data-number="2.1.3" class="anchored" data-anchor-id="medidas-de-evaluación-en-clustering"><span class="header-section-number">2.1.3</span> Medidas de evaluación en clustering</h3>
+<section id="elbow-method" class="level4" data-number="2.1.3.1">
+<h4 data-number="2.1.3.1" class="anchored" data-anchor-id="elbow-method"><span class="header-section-number">2.1.3.1</span> <strong>Elbow method</strong></h4>
+</section>
+<section id="la-silueta-silhouette" class="level4" data-number="2.1.3.2">
+<h4 data-number="2.1.3.2" class="anchored" data-anchor-id="la-silueta-silhouette"><span class="header-section-number">2.1.3.2</span> La silueta (<em>silhouette</em>)</h4>
+</section>
+<section id="la-brecha-gap" class="level4" data-number="2.1.3.3">
+<h4 data-number="2.1.3.3" class="anchored" data-anchor-id="la-brecha-gap"><span class="header-section-number">2.1.3.3</span> La brecha (<em>gap</em>)</h4>
+</section>
+</section>
+</section>
+<section id="reducción-de-la-dimensionalidad" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="reducción-de-la-dimensionalidad"><span class="header-section-number">2.2</span> Reducción de la dimensionalidad</h2>
+<section id="análisis-de-componentes-principales-pca" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="análisis-de-componentes-principales-pca"><span class="header-section-number">2.2.1</span> Análisis de componentes principales (PCA)</h3>
+</section>
+<section id="t-distributed-stochastic-neighbor-embedding-t-sne" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="t-distributed-stochastic-neighbor-embedding-t-sne"><span class="header-section-number">2.2.2</span> t-distributed Stochastic Neighbor Embedding (t-SNE)</h3>
+</section>
+<section id="uniform-manifold-approximation-and-projection-umap" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="uniform-manifold-approximation-and-projection-umap"><span class="header-section-number">2.2.3</span> Uniform Manifold Approximation and Projection (UMAP)</h3>
+<p>Se trata de una técnica reciente de reducción de la dimensionalidad, que puede usarse de modo similar a t-SNE (para representaciones gráficas), pero también como herramienta no lineal de reducción de las dimensiones en el espacio de representación.</p>
+<ul>
+<li><a href="https://umap-learn.readthedocs.io/en/latest/">Manual oficial de UMAP</a>.</li>
+</ul>
+<p>Los datos deben cumplir tres supuestos iniciales:</p>
+<ul>
+<li>Los datos se distribuyen de modo uniforme en un manifold de Riemann.</li>
+<li>La métrica de Riemann es constante localmente (o se puede aproximar a una constante).</li>
+<li>El manifold está localmente conectado.</li>
+</ul>
+<p>El <a href="https://cran.r-project.org/web/packages/umap/index.html">paquete <code>umap</code></a> en R implementa este algoritmo. En la <a href="https://github.com/tkonopka/umap">página de descripción en GitHub</a> se encuentran algunos ejemplos de visualizaciones con UMAP para el dataset MNIST de dígitos.</p>
+<p>Siendo un algoritmo que incluye componentes estocásticas (igual que t-SNE), no se puede garantizar que el resultado de la proyección obtenida sea reproducible. No obstante, se pueden <a href="https://umap-learn.readthedocs.io/en/latest/reproducibility.html">fijar ciertos valores</a> que permiten obtener resultados reproducibles, a costa de perder eficiencia.</p>
+<p>La documentación oficial también incluye varios ejemplos de cómo podemos usar <a href="https://umap-learn.readthedocs.io/en/latest/clustering.html">UMAP como herramienta de <em>clustering</em></a>.</p>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
@@ -491,7 +536,6 @@ James, W., G. (2021). <em><span>An Introduction to Statistical Learning with App
 Tan, P.-N., Steinbach, M. S., Karpatne, A., &amp; Kumar, V. (2019). <em>Introduction to Data Mining (Second Edition)</em>. Pearson.
 </div>
 </div>
-</section>
 </section>
 </section>
 
