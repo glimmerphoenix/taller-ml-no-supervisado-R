@@ -197,3 +197,45 @@ en dos clústers.
 - *Método de Ward*: minimizar la suma de las diferencias cuadráticas dentro de los clusteres. De ese modo, se
 minimiza la varianza total del conglomerado.
 - *Enlace de centroides*: se calcula la distancia entre el centroide del grupo A y el centroide del grupo B.
+
+### Medidas de evaluación en clustering
+
+#### **Elbow method**
+
+#### La silueta (*silhouette*)
+
+#### La brecha (*gap*)
+
+## Reducción de la dimensionalidad
+
+### Análisis de componentes principales (PCA)
+
+
+### t-distributed Stochastic Neighbor Embedding (t-SNE)
+
+
+### Uniform Manifold Approximation and Projection (UMAP)
+
+Se trata de una técnica reciente de reducción de la dimensionalidad, que puede usarse de modo
+similar a t-SNE (para representaciones gráficas), pero también como herramienta no lineal de
+reducción de las dimensiones en el espacio de representación.
+
+- [Manual oficial de UMAP](https://umap-learn.readthedocs.io/en/latest/).
+
+Los datos deben cumplir tres supuestos iniciales:
+
+- Los datos se distribuyen de modo uniforme en un manifold de Riemann.
+- La métrica de Riemann es constante localmente (o se puede aproximar a una constante).
+- El manifold está localmente conectado.
+
+El [paquete `umap`](https://cran.r-project.org/web/packages/umap/index.html) en R implementa este
+algoritmo. En la [página de descripción en GitHub](https://github.com/tkonopka/umap) se encuentran
+algunos ejemplos de visualizaciones con UMAP para el dataset MNIST de dígitos.
+
+Siendo un algoritmo que incluye componentes estocásticas (igual que t-SNE), no se puede garantizar
+que el resultado de la proyección obtenida sea reproducible. No obstante, se pueden
+[fijar ciertos valores](https://umap-learn.readthedocs.io/en/latest/reproducibility.html) que permiten
+obtener resultados reproducibles, a costa de perder eficiencia.
+
+La documentación oficial también incluye varios ejemplos de cómo podemos usar
+[UMAP como herramienta de *clustering*](https://umap-learn.readthedocs.io/en/latest/clustering.html).
