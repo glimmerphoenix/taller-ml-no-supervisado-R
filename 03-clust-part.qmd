@@ -332,5 +332,74 @@ resolver el problema PAM (FastPAM, FastCLARA Y FastCLARANS) [@schubert2019fastPA
 
 ### Ejemplo de implementación en R
 
+```{r}
+#| label: fig-fastkmedoids
+#| fig-cap: "Resultado del clustering con `fastkmedoids` sobre el dataset USArrests."
+#| message: false
 
+# 1. Cargar librerías necesarias
+# Si no tienes fastkmedoids: install.packages("fastkmedoids")
+library(fastkmedoids)
+library(ggplot2)
+library(ggrepel) # Opcional: para que las etiquetas de texto no se solapen
+
+# 2. Cargar y preparar los datos
+data("USArrests")
+
+# Es fundamental escalar los datos porque 'Assault' tiene valores mucho más grandes
+# que 'Murder', lo que sesgaría el cálculo de distancias.
+df_scaled <- scale(USArrests)
+
+# fastpam requiere una matriz de distancias, no el dataframe directo
+dist_matrix <- dist(df_scaled, method = "euclidean")
+
+# 3. Ejecutar fastpam (K-Medoids rápido)
+set.seed(123)
+k <- 4 # Elegimos 4 grupos para este ejemplo
+resultado <- fastpam(dist_matrix, n=nrow(df_scaled), k = k)
+
+# El objeto 'resultado' tiene:
+# resultado@medoids: los índices (filas) de los estados que son medoides
+# resultado@assignment: el grupo asignado a cada estado
+# resultado@cost: valor final de la función de coste
+
+# 4. Reducción de dimensión para visualización (PCA)
+# Necesitamos pasar de 4 variables a 2 ejes (PC1 y PC2) para poder graficar
+pca <- prcomp(df_scaled)
+pca_data <- as.data.frame(pca$x[, 1:2]) # Tomamos las dos primeras componentes
+
+# 5. Construimos el data.frame para el gráfico
+# Añadimos la información del cluster y si es medoide o no
+pca_data$Cluster <- as.factor(resultado@assignment)
+pca_data$State   <- rownames(USArrests)
+pca_data$IsMedoid <- FALSE
+
+# Marcamos cuáles filas son los medoides reales encontrados por fastpam
+pca_data$IsMedoid[resultado@medoids] <- TRUE
+
+# 6. Creación del gráfico con ggplot2
+ggplot(pca_data, aes(x = PC1, y = PC2, color = Cluster)) +
+  
+  # A. Dibujar los puntos normales (Estados)
+  geom_point(alpha = 0.6, size = 2) +
+  
+  # B. Dibujar los Medoides (Más grandes y con forma diferente)
+  geom_point(data = subset(pca_data, IsMedoid == TRUE), 
+             size = 5, shape = 18, stroke = 2) +
+  
+  # C. Etiquetas para los medoides (Nombres de los estados representativos)
+  geom_label_repel(data = subset(pca_data, IsMedoid == TRUE),
+                   aes(label = State),
+                   box.padding = 0.5, show.legend = FALSE) +
+  
+  # D. Elipses para visualizar las áreas de los grupos (Opcional)
+  stat_ellipse(aes(fill = Cluster), geom = "polygon", alpha = 0.1) +
+  
+  # Estética general
+  theme_minimal() +
+  labs(title = "Visualización de Clustering con fastpam (USArrests)",
+       subtitle = "Los rombos grandes indican los Medoides (Centros reales de cada grupo)",
+       x = "Componente Principal 1",
+       y = "Componente Principal 2")
+```
 
