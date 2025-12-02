@@ -155,7 +155,7 @@ Ahora, podemos tratar de identificar algunos perfiles frecuentes de clientes:
 3. *Clientes *premium* *: ingresos altos y alto `SpendingScore` (este sería el grupo más valioso para los comerciantes).
 4. *Promedio*: ingresos medios y gasto medio.
 
-### Resolución con PAM (*k*-medoids)
+### Resolución con PAM (*k*-medoids) {#sec-pam-case-study}
 
 ```{r}
 # 1. Cargar y limpiar datos

@@ -205,28 +205,183 @@ grupos (es decir, cómo de cercanos o similares son los elementos dentro del gru
 **separación entre grupos** (es decir, cómo de lejos están los clústeres entre sí). Muchas de estas
 medidas se pueden aplicar a ambos tipos de algoritmos, tanto jerárquicos como no jerárquicos.
 
+El paquete `factoextra` contiene varias funciones de utilidad para evaluación de resultados de *clustering*
+e interpretación gráfica de dicha evaluación. En particular, la función `fviz_nbclust` permite
+determinar y visualizar el número óptimo de grupos, en función de varias posibles métricas. A
+continuación, presentamos varias métricas *intrínsecas*, que miden la calidad geométrica de una 
+partición dada, independientemente de cómo se haya generado esa partición (ya sea de *k*-means 
+o de un corte en un dendrograma).
+
+Preparamos unos datos para los ejemplos, escalando primero los valores de las variables para todos
+esten en rangos comparables
+
+```{r}
+#| label: eval-example-data
+#| message: false
+
+library(factoextra)
+library(cluster)
+df <- scale(USArrests)
+```
+
+#### La silueta (*silhouette*)
+
+La **silueta** (en inglés *silhouette*) cuantifica lo bien que se ajusta cada elemento a su propio
+cluster, si lo comparamos con el vecino. Al calcular la silueta promedio de todas las agrupaciones
+de elemtnos, podemos determinar si la solución de *clustering* es buena en conjunto, siendo mejores
+los valores más elevados. Si comparamos la silueta promedio obtenida para diferentes valores
+de `k`, podemos ver de todos ellos el que obtiene el valor más elevado.
+
+La métrica de la silueta es **aplicable a ambos tipos de algoritmos de clustering**, tanto jerárquicos
+como no jerárquicos. Veamos un ejemplo con varias configuraciones del parámetro `k` usando *k*-means 
+sobre el conjunto de datos `USArrests`.
+
+```{r}
+#| label: fig-example-silhouette
+#| fig-cap: "Comparativa de los valores de silueta promedio para varias configuraciones del parámetro `k` en clustering con *k*-means."
+fviz_nbclust(df, kmeans, method = "silhouette")
+```
+
+```{r}
+#| label: fig-vis-silhouette
+#| fig-cap: "Visualización de los valores de silueta para cada elemento agrupado. Los valores negativos (barras en sentido descendente) indican puntos mal agrupados."
+#| warning: false
+
+kmeans_4 <- kmeans(df, centers=4, nstart = 25)
+silueta <- silhouette(kmeans_4$cluster, dist(df))
+fviz_silhouette(silueta, palette = "jco", print.summary = FALSE)
+```
+
+En la sección @sec-pam-case-study veremos un ejemplo práctico con código para inspeccionar los valores
+reportados por la silueta como mal clasificados. La línea roja en el gráfico marca el valor promedio de
+silueta de todos el conjunto de agrupamientos.
+
 #### *Elbow method*
 
 Se trata de un método directo para evaluar cuál podría ser el número de grupos $k$ más adecuado para
 el problema de agrupamiento a resolver. En el caso de algoritmos partitivos, este valor es un parámetro
 de configuración que se fija al inicio del problema, por lo que podemos probar con varias opciones y comparar
-los resultados para la función de coste que determina el resultado. En el caso de algoritmos jerárquicos,
-se puden considerar distintos niveles de corte para comprobar en cada uno de ellos las propiedades de los
-grupos resultantes.
+los resultados para la función de coste que determina el resultado. Sólo se suele usar con este tipo
+de algoritmos, ya que para los jerárquicos se prefieren otros métodos de evaluación.
 
+En la @fig-example-elbow vemos un ejemplo comparando diferentes valores de la métrica *WCSS* para varias
+configuraciones del parámetro `k` usando *k*-means sobre el conjunto de datos `USArrests`.
 
+```{r}
+#| label: fig-example-elbow
+#| fig-cap: "Ejemplo de un gráfico que compara los resultados del WCSS para varios valores del parámetro de configuración `k` en *k*-means."
 
-#### La silueta (*silhouette*)
+fviz_nbclust(df, kmeans, method = "wss") +
+   geom_vline(xintercept = 4, linetype = 2)
+```
 
 #### La brecha (*gap*)
+
+Esta métrica compara la WCSS observada con la esperada de un conjunto de datos generados sintéticamente
+de forma aleatoria. En este caso, también se utiliza con algoritmos partitivos (y para distancia Euclídea).
+El mejor valor de `k` es el que maximiza la métrica de *gap*.
+
+```{r}
+#| label: fig-example-gap
+#| fig-cap: "Ejemplo de un gráfico comparativo de los valores de *gap* obtenidos para diferentes valores del parámetro de configuración `k` con el algoritmo *k*-means."
+
+fviz_nbclust(df, kmeans, method = "gap") +
+   geom_vline(xintercept = 4, linetype = 2)
+```
 
 ## Reducción de la dimensionalidad
 
 ### Análisis de componentes principales (PCA)
 
+El Análisis de Componentes Principales (PCA por sus siglas en inglés) se refiere al proceso por el cuál
+computamos las **componentes principales** del espacio de representación de nuestros datos y su posterior
+utilización para comprender mejor los patrones e información que contiene el *dataset*. Las *componentes
+principales* son las direcciones en el espacio de descripción de los datos a lo largo de las cuales los
+elementos del dataset tienen *alta variabilidad*.
+
+Se trata de una técnica de aprendizaje máquina no supervisado, puesto que sólo involucra un conjunto de
+variables descriptivas de los datos, $\{x_1, x_2,\dots, x_d \}$, y ninguna variable de salida [@james2021].
+Además de para el análisis, se puede usar como herramienta de visualización (permitiendo representar los
+elementos en un espacio bidimensional o, al menos, de menos dimensiones que el original), así como también
+para imputación de datos [@james2021].
+
+La idea intuitiva detrás del PCA es que, si bien los datos están originalmente representados en un espacio
+con $d$ dimensiones, no todas ellas contribuyen de igual forma a la descripción de los datos. En otras
+palabras, no todas ellas son *"interesantes"*, donde la medida de interés radica en cuánto varían las
+observaciones a lo largo de cada dimensión. Cada una de las direcciones o *componentes* principales
+halladas mediante el PCA es una combinación lineal de las $d$ características descriptivas, cada una de
+ellas contribuyendo con un cierto peso (*loading*). Así, la primera componente principal viene dada
+por la combinación lineal normalizada de las variables que tiene la variabilidad más alta:
+
+$$
+Z_1 = \phi_{11}X_1 + \phi_{21}X_2+\dots+\phi_{d1}X_d
+$$ {#eq-pca-z1}
+
+Que sea normalizada implica que $\sum_{j=1}^p \phi_{j1}^2 = 1$. Los pesos o *loadings* son, precisamente,
+el conjunto de coeficientes $\phi_{11}, \phi_{21},\dots,\phi_{d1}$. Numéricamente, el cálculo de los pesos
+se resuelve mediante técnicas de optimización [@james2021]. Después, se repite el proceso para obtener
+la segunda componente principal, que será la que recoja la mayor variabilidad de todas las combinaciones
+lineales que **estén incorreladas** con $Z_1$. Así, cada componente principal debe ser *ortogonal* a todas
+las anteriores (esto es consecuencia de que todas estén incorreladas entre sí).
+
+La @fig-pca2comp-usarrests muestra las dos primeras componentes principales calculadas sobre el dataset
+`USArrests`. En la @sec-pca-usarrests veremos un ejemplo práctico, con codigo en R, de cómo calcular un
+PCA sobre este conjunto de datos.
+
+![Representación gráfica de las dos primeras componentes principales calculadas sobre el conjunto de datos `USArrests`. Fuente: Figura 12.1 de [@james2021].](img/PCA-2comp-USArrests.png){#fig-pca2comp-usarrests width="95%"}
 
 ### t-distributed Stochastic Neighbor Embedding (t-SNE)
 
+El algoritmo t-SNE (*t-Distributed Stochastic Neighbor Embedding*) es una técnica de **reducción de 
+dimensionalidad no lineal** muy popular, utilizada principalmente para la visualización de conjuntos de 
+datos de alta dimensión en un espacio de representación en 2D o 3D. Su objetivo principal es preservar 
+la estructura local de los datos.
+
+Sus principales características son:
+
+- Estrategia para preservar la estructura local de los datos: t-SNE se centra en preservar las distancias 
+pequeñas (puntos cercanos en el espacio original) en el espacio de baja dimensión. Esto significa que los 
+puntos que estaban cerca en el *dataset* original deben seguir estando cerca en la gráfica 2D.
+
+- Distribuciones de probabilidad: el algoritmo convierte las distancias Euclídeas en el espacio de alta 
+dimensión en probabilidades condicionales que representan la similitud.
+
+  - En el espacio original (alta dimensión), usa una distribución Gaussiana para medir la similitud.
+
+  - En el espacio de destino (baja dimensión), usa la distribución t-Student (con un grado de libertad, 
+  de ahí la "t" en el nombre), que tiene colas más pesadas en sus extremos. Esto mitiga el problema del 
+  *crowding* (agolpamiento de puntos).
+
+- Técnica no lineal: a diferencia del PCA (que solo encuentra proyecciones lineales), t-SNE puede capturar 
+relaciones complejas y no lineales en los datos.
+
+- Uso de un parámetro de **perplejidad** (*perplexity*): Este es el hiperparámetro más crítico que hay que
+configurar para que funcione el algoritmo. Se puede interpretar como una medida del número efectivo de 
+vecinos que t-SNE considera al agrupar cada punto.
+
+  - Controla el equilibrio entre el enfoque local y global.
+
+  - Un valor de perplejidad incorrecto puede generar visualizaciones engañosas.
+
+t-SNE es una técnica sobresaliente para generar visualizaciones donde los clústeres naturales de los 
+datos se separan visualmente en la gráfica 2D. Como hemos visto, puede capturar relaciones no lineales
+en los datos, superando a PCA en ese aspecto (está restringido a relaciones lineales). Además, al emplear
+la distribución t-Student en el espacio de menor dimensionalidad, favorece que los agrupamientos estén
+más separados entre sí y aclara el aspecto del gráfico. Por último, la interpretación visual que ofrece
+es muy directa: si los puntos están cercanos entre sí son similares, si están lejos entre sí son más
+diferentes.
+
+Sin embargo, su aplicación trae consigo varias limitaciones:
+
+- En conjuntos de datos muy grandes ($n > 10K$) requiere gran cantidad de memoria, ya que su complejidad
+es $O(N^2)$.
+- El resultado gráfico obtenido es muy sensible al valor del parámetro *perplexity*. Pequeñas alteraciones
+en su valor se traducen en cambios importantes en el aspecto del gráfico.
+- La distancia entre agrupamientos no es directamente interpretable. Es decir, si dos agrupamientos están
+cercanos entre sí, significa que son similares, pero no sabes con certeza *cuánto de similares* son en el
+espacio transformado.
+- No proporciona un mapeo determinista. No se puede generar una visualización para un conjunto de datos y
+posteriormente añadir nuevos puntos a la misma gráfica. Se debe calcular para todo el conjunto a la vez.
 
 ### Uniform Manifold Approximation and Projection (UMAP)
 

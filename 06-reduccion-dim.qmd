@@ -2,7 +2,7 @@
 
 Ejemplos de algoritmos de cada clase.
 
-## PCA
+## PCA {#sec-pca-usarrests}
 
 Utilizaremos el dataset estándar `USArrests` que proporciona R. Seguiremos el ejemplo del 
 laboratorio del Capítulo 12 de [@james2021] (Sec. 12.5.1).
