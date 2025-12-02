@@ -131,6 +131,10 @@ La @fig-kmedoids-clust muestra visualmente el proceso iterativo para encontrar l
 
 ![Proceso iterativo para definir los agrupamientos en el algoritmo *k*-medoids. Fuente: Wikipedia](img/K-Medoids-Clustering.gif){#fig-kmedoids-clust width="70%"}
 
+Como ocurría en el caso de *k*-means, se trata de un problema NP-hard para el que no se puede obtener
+una solución exacta, por lo que se suelen emplear heurísticos para solucionarlo. En el @sec-part-clustering
+veremos algunos ejemplos de variantes para solucionarlo implementadas en R.
+
 #### DBSCAN
 
 DBSCAN (*Density-Based Spatial Clustering of Applications with Noise*) es un algoritmo de agrupamiento 

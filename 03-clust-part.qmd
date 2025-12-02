@@ -1,14 +1,34 @@
-# Clustering particionado
-
+# Clustering particionado {#sec-part-clustering}
 
 ## El algoritmo *k*-means
 
+A la hora de implementar en la práctica el algoritmo *k*-means, debemos tener en cuenta varios 
+aspectos importantes.
 
-- Ubicación de partida de los centroides mediante el algoritmo *k-means++* [@arthur2007].
+- Ubicación de partida de los centroides: el algoritmo es sensible a la ubicación inicial de los
+`k` centroides para cada grupo. Una mala ubicación puede ofrecer un resultado nada óptimo o, incluso, provocar
+que el algoritmo no converja en un número razonable de iteraciones. Para resolver este problema, se
+ha propuesto el algoritmo *k-means++* [@arthur2007], que inicializa los centroides de forma que se asegure
+que la solución obtenida es razonablemente óptima.
+- Función de distancia Euclídea: Como ya se ha avisado, la mayoría de implementaciónes de *k*-means
+en paquetes software y bibliotecas asumen que se va a emplear la distancia Euclídea para comparar los elementos,
+estableciendo como objetivo minimizar la WCSS.
+- Método para elegir el número de agrupamientos `k`: puesto que no se puede saber a priori el mejor
+valor de `k`, se suele aconsejar emplear algún tipo de métrica de evaluación para ponderar la bondad de los
+grupo generados, comparando los resultados para diversos valores de `k`.
 
 ### Implementaciones y mejoras en *k*-means
 
-- Paper con la evolución de métodos y optimizaciones para resolver *k*-means.
+Otro aspecto poco conocido pero muy interesante es la existencia de un gran número de implementaciones para
+resolver el algoritmo *k*-means, que han ido surgiendo para acelerar el cómputo o ahorrar muchas operaciones
+[@wang2020efficiency]. La @fig-kmeans-implem muestra una línea temporal que describe algunas de las mejoras
+más sobresalientes que se han ido desarrollando.
+
+![Línea temporal que muestra las implementaciones y mejoras más destacadas que se han desarrollado para resolver el problema del agrupamiento con *k*-means. Fuente: [@wang2020efficiency].](img/k-means-timeline.png){#fig-kmeans-implem width="100%"}
+
+Es conveniente, siempre que sea posible, informarnos bien acerca de la implementación específica que integra
+el software que vamos a utilizar para resolver *k*-means, o si existen varias alternativas cuál de ellas es
+la más propicia para nuestros intereses.
 
 ### Ejemplo práctico en R
 
@@ -125,7 +145,6 @@ k_3$centers
 #| label: fig-kmeans-eval
 
 # We can also visualize the clusters to get additional insight.
-library(factoextra)
 fviz_cluster(k_3,
              data = maryland_college_scaled,
              repel = TRUE,
@@ -295,5 +314,23 @@ apartado 2) anterior. ¿Cuál piensas que es el valor óptimo y por qué?
 
 ## PAM: el algoritmo *k*-medoids
 
-Descripción y ejemplos de implementación
+El algoritmo *k*-medoids tiene algunas importantes ventajas respecto de *k*-means:
+
+- Los prototipos de cada grupo no son *centroides* (puntos ficticios o sintéticos) sino *medoides,
+es decir, elementos *reales* del dataset. Esto facilita mucho la interpretación de los resultados,
+puesto que se puede analizar las características de cada elemento prototipo para concluir cuáles
+son los principales rasgos de los elementos de ese grupo.
+- Mientras que en muchas implementaciones de *k*-means, se asume que vamos a emplear la función de
+distancia Euclídea y que se busca minimizar la WCSS para resolver el problema, en las implementaciones
+de *k*-medoids se pueden utilizar **funciones de distancia arbitrarias** para comparar y agrupar
+los elementos.
+
+También existen implementaciones con rendimiento mejorado de este algoritmo. Por ejemplo, el paquete
+[`fastkmedoids` en R](https://cran.r-project.org/web/packages/fastkmedoids/refman/fastkmedoids.html)
+proporciona *wrappers* para las implementaciones en C++ de varios algoritmos más rápidos para 
+resolver el problema PAM (FastPAM, FastCLARA Y FastCLARANS) [@schubert2019fastPAM].
+
+### Ejemplo de implementación en R
+
+
 
