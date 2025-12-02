@@ -87,6 +87,38 @@ tomar medidas para encontrar buenos agrupamientos.
 
 ![Proceso iterativo para definir los agrupamientos en el algoritmo *k*-means. Fuente: Wikipedia](img/K-means-convergence.gif){#fig-kmeans-clust width="70%"}
 
+Si denotamos como $C_1, \dots, C_k$ los conjuntos que contienen los índices de las observaciones que
+se asignan a cadad grupo, dichos conjuntos satisfacen dos propiedades:
+
+1. $C_1 \cup C_2 \cup \dots \cup C_k = {1, \dots, n}$; es decir, cada observación pertenece al menos a
+uno de los conjuntos.
+2. $C_j \cap C_{j'} = \emptyset;\, \forall j \neq j'$, es decir, los clusters no tienen solape entre sí y
+ninguna observación pertenece a más de un cluster.
+
+El objetivo que persigue *k*-means es que la *variación intra-cluster* sea lo más pequeña posible. En
+inglés, esa **within-cluster variation** para el grupo $C_j$ es una medida $W(C_j)$ de la cantidad de
+diferencia que existe entre los elementos asignados a ese grupo. Por tanto, el objetivo es resolver
+el problema expresado por la @eq-k-means-obj:
+
+$$
+min_{C_1,\dots,C_k} \left\{ \sum_{j=1}^k W(C_j) \right\}
+$$ {#eq-k-means-obj}
+
+En otras palabras, se pretende minimizar la suma en todos los grupos de la variación registrada dentro
+de cada grupo. Si utilizamos la distancia Euclídea, entonces W(C_k) se convierte en la función conocida
+como Within-Cluster Sum of Squares (WCSS).
+
+::: {.callout-caution}
+## Otras métricas de distancia en *k*-means
+
+Debemos tener mucho cuidado con la utilzación del algoritmo *k*-means si queremos emplear otras funciones
+métricas de distancia distintas de la distancia Euclídea (norma $L_2$). La mayoría de paquetes y bibliotecas
+software **asumen por defecto** que se va a utilizar dicha distancia, ya que la función objetivo que se
+plantea en el problema de optimización que debe resolver es, precisamente, minimizar el WCSS. Como acabamos
+de ver arriba, este criterio *sólo es valido para la distancia Euclídea**. Existen algunas implementaciones
+del algoritmo con otras funciones de distancia, pero no son para nada habituales.
+:::
+
 #### *k*-medoids
 
 Es un algoritmo clásico de particionado que divide el conjunto de datos en $k$ grupos. Nuevamente, este
@@ -137,6 +169,11 @@ se suele representar gráficamente en forma de un árbol llamado **dendograma**,
 
 ![Ejemplo de un dendograma que representa los agrupamientos encontrados tras aplicar un algoritmo de *clustering* jerárquico. Fuente: Figura 21.1 de [@boehmke2019].](img/dendrogram.png){#fig-dendogram width="90%"}
 
+Debemos tener presente que, en función del nivel en el que "cortemos" el dendograma, obtendremos un número
+diferente de grupos. Por ejemplo, la @fig-dendogram-cuts
+
+![Tres dendogramas que muestran diferentes cortes a distinto nivel del árbol. Izq.: dendograma original (sin cortes); (centro) corte a nivel 9, que genera dos agrupamientos; (dcha.) corte a nivel 5, que define 3 agrupamientos. Fuente: Figura 12.11 de [@james2021].](img/dendogram-cuts.png){#fig-dendogram-cuts width="95%"}
+
 #### AGNES
 
 El método de *clustering* aglomerativo parte de un conjunto de $n$ grupos, uno por cada elemento de nuestro
@@ -146,12 +183,13 @@ contiene a todos los datos.
 Para ello, se necesita establecer un criterio de "enlace" para fusionar los grupos, que determine la distancia
 entre dos agrupamientos. Se pueden usar varios criterios:
 
-- Agrupamiento de enlace completo: minimiza la distancia máxima entre las parejas de observaciones de dos
+- *Agrupamiento de enlace completo*: minimiza la distancia máxima entre las parejas de observaciones de dos
 agrupamientos.
-- Método de Ward: minimizar la suma de las diferencias cuadráticas dentro de los clusteres. De ese modo, se
-minimiza la varianza total del conglomerado.
-- Agrupamiento de enlace promedio: minimizar la media de las distancias entre las observaciones pertenecientes
+
+- *Agrupamiento de enlace promedio*: minimizar la media de las distancias entre las observaciones pertenecientes
 a dos clusteres (calculadas por pares).
-- Agrupamiento de enlace mínimo o simple: minimizar las distancias entre las observaciones más cercanas
+- *Agrupamiento de enlace mínimo o simple*: minimizar las distancias entre las observaciones más cercanas
 en dos clústers.
-- Enlace de centroides: se calcula la distancia entre el centroide del grupo A y el centroide del grupo B.
+- *Método de Ward*: minimizar la suma de las diferencias cuadráticas dentro de los clusteres. De ese modo, se
+minimiza la varianza total del conglomerado.
+- *Enlace de centroides*: se calcula la distancia entre el centroide del grupo A y el centroide del grupo B.
