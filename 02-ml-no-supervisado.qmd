@@ -106,7 +106,7 @@ $$ {#eq-k-means-obj}
 
 En otras palabras, se pretende minimizar la suma en todos los grupos de la variación registrada dentro
 de cada grupo. Si utilizamos la distancia Euclídea, entonces W(C_k) se convierte en la función conocida
-como Within-Cluster Sum of Squares (WCSS).
+como *Within-Cluster Sum of Squares* (WCSS).
 
 ::: {.callout-caution}
 ## Otras métricas de distancia en *k*-means
@@ -115,7 +115,7 @@ Debemos tener mucho cuidado con la utilzación del algoritmo *k*-means si querem
 métricas de distancia distintas de la distancia Euclídea (norma $L_2$). La mayoría de paquetes y bibliotecas
 software **asumen por defecto** que se va a utilizar dicha distancia, ya que la función objetivo que se
 plantea en el problema de optimización que debe resolver es, precisamente, minimizar el WCSS. Como acabamos
-de ver arriba, este criterio *sólo es valido para la distancia Euclídea**. Existen algunas implementaciones
+de ver arriba, este criterio *sólo es valido para la distancia Euclídea*. Existen algunas implementaciones
 del algoritmo con otras funciones de distancia, pero no son para nada habituales.
 :::
 
@@ -200,7 +200,21 @@ minimiza la varianza total del conglomerado.
 
 ### Medidas de evaluación en clustering
 
-#### **Elbow method**
+La mayoría de las técnicas de evaluación de *clusering* intentan cuantificar la **cohesión** de los
+grupos (es decir, cómo de cercanos o similares son los elementos dentro del grupo), así como la
+**separación entre grupos** (es decir, cómo de lejos están los clústeres entre sí). Muchas de estas
+medidas se pueden aplicar a ambos tipos de algoritmos, tanto jerárquicos como no jerárquicos.
+
+#### *Elbow method*
+
+Se trata de un método directo para evaluar cuál podría ser el número de grupos $k$ más adecuado para
+el problema de agrupamiento a resolver. En el caso de algoritmos partitivos, este valor es un parámetro
+de configuración que se fija al inicio del problema, por lo que podemos probar con varias opciones y comparar
+los resultados para la función de coste que determina el resultado. En el caso de algoritmos jerárquicos,
+se puden considerar distintos niveles de corte para comprobar en cada uno de ellos las propiedades de los
+grupos resultantes.
+
+
 
 #### La silueta (*silhouette*)
 
