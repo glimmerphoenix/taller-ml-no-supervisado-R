@@ -1,3 +1,24 @@
 # Clustering jerárquico
 
-Ejemplos de algoritmos de cada clase
+## DBSCAN
+
+### Ejemplo básico con R
+
+```{r}
+library(dbscan)
+library(ggplot2)
+
+# Datos de ejemplo
+data("moons", package = "dbscan")
+
+# Ejecución del algoritmo
+# eps: radio de búsqueda
+# minPts: puntos mínimos para considerar núcleo
+res <- dbscan(moons, eps = 0.3, minPts = 5)
+
+# Visualización
+ggplot(moons, aes(X, Y, color = factor(res$cluster))) +
+  geom_point() +
+  labs(title = "Resultado DBSCAN", color = "Cluster (0 = Ruido)") +
+  theme_minimal()
+```
