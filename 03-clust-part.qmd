@@ -328,7 +328,7 @@ los elementos.
 También existen implementaciones con rendimiento mejorado de este algoritmo. Por ejemplo, el paquete
 [`fastkmedoids` en R](https://cran.r-project.org/web/packages/fastkmedoids/refman/fastkmedoids.html)
 proporciona *wrappers* para las implementaciones en C++ de varios algoritmos más rápidos para 
-resolver el problema PAM (FastPAM, FastCLARA Y FastCLARANS) [@schubert2019fastPAM].
+resolver el problema PAM (FastPAM, FastCLARA y FastCLARANS) [@schubert2019fastPAM].
 
 ### Ejemplo de implementación en R
 
