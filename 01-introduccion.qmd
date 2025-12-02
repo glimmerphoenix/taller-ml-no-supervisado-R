@@ -107,7 +107,7 @@ $$
 d_{Mink}(A,B) = \left( \sum_{j=1}^d |x_{Aj}-x_{Bj}|^p \right)^{1/p},
 $$ {#eq-mink-dist}
 
-siendo $\|A\|_p = \left( \sum_{j=1}^d |x_{Aj}|^p \right)^{1/p}$ la *norma* $p* (denotada muchas veces como
+siendo $\|A\|_p = \left( \sum_{j=1}^d |x_{Aj}|^p \right)^{1/p}$ la *norma* $p$* (denotada muchas veces como
 $L_p$) del vector A. Así, para $p=1$ tenemos la *distancia Manhattan* ($L_1$), mientras que para $p=2$ tenemos
 la popular *distancia Euclídea* ($L_2$).
 
@@ -140,7 +140,7 @@ La @tbl-distance-funcs resume información básica sobre algunas funciones de di
 
 : Algunas funciones de distancia muy frecuentes. {#tbl-distance-funcs}
 
-(*): Se puede efectuar una trasnformación a una distancia "comparable" que sí cumple las propiedades de métrica.
+(*): Se puede efectuar una transformación a una distancia "comparable" que sí cumple las propiedades de métrica.
 
 #### Tipos de clustering
 
@@ -191,7 +191,7 @@ Sería muy complicado conseguir
 la representación gráfica de todos estos elementos para detectar las imágenes de dígitos que son
 parecidas entre sí (por ejemplo, un grupo con los números `4`, otro con los números `8`, etc.). Las
 técnicas de reducción de dimensionalidad nos permiten proyectar la representación original de estos
-datos en un espacio $\mathbb{R}^784$ sobre un espacio $\mathbb{R}^2$, que sí podemos representar
+datos en un espacio $\mathbb{R}^{784}$ sobre un espacio $\mathbb{R}^2$, que sí podemos representar
 gráficamente.
 
 Por ejemplo, la @fig-mnist-tsne muestra una representación gráfica en 2D de una muestra aleatoria de
