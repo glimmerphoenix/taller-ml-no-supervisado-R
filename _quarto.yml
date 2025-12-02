@@ -6,7 +6,7 @@ project:
     browser: true
 
 book:
-  title: "Visualización de datos espaciales con R"
+  title: "Aprendizaje máquina no supervisado con R"
   author:
     - "María Jesús Algar"
     - "Felipe Ortega"
