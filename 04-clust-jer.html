@@ -290,9 +290,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Tabla de contenidos</h2>
    
   <ul>
-  <li><a href="#dbscan" id="toc-dbscan" class="nav-link active" data-scroll-target="#dbscan"><span class="header-section-number">4.1</span> DBSCAN</a>
+  <li><a href="#agnes" id="toc-agnes" class="nav-link active" data-scroll-target="#agnes"><span class="header-section-number">4.1</span> AGNES</a></li>
+  <li><a href="#dbscan" id="toc-dbscan" class="nav-link" data-scroll-target="#dbscan"><span class="header-section-number">4.2</span> DBSCAN</a>
   <ul class="collapse">
-  <li><a href="#ejemplo-básico-con-r" id="toc-ejemplo-básico-con-r" class="nav-link" data-scroll-target="#ejemplo-básico-con-r"><span class="header-section-number">4.1.1</span> Ejemplo básico con R</a></li>
+  <li><a href="#ejemplo-básico-con-r" id="toc-ejemplo-básico-con-r" class="nav-link" data-scroll-target="#ejemplo-básico-con-r"><span class="header-section-number">4.2.1</span> Ejemplo básico con R</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -319,12 +320,187 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="dbscan" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="dbscan"><span class="header-section-number">4.1</span> DBSCAN</h2>
-<section id="ejemplo-básico-con-r" class="level3" data-number="4.1.1">
-<h3 data-number="4.1.1" class="anchored" data-anchor-id="ejemplo-básico-con-r"><span class="header-section-number">4.1.1</span> Ejemplo básico con R</h3>
+<section id="agnes" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="agnes"><span class="header-section-number">4.1</span> AGNES</h2>
+<p>Veamos un ejemplo con el dataset <code>USArrests</code>. La función <code>cluster::agnes</code> implementa este algoritmo en R. También usaremos las funciones de utilidad del paquete <code>factoextra</code> para representación gráfica y comparación de alternativas de agrupamiento utilizando métricas de evaluación del resultado.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dbscan)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> USArrests</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># eliminamos valores faltantes</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(df)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># escalamos las variables</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">scale</span>(df)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Murder   Assault   UrbanPop         Rape
+Alabama    1.24256408 0.7828393 -0.5209066 -0.003416473
+Alaska     0.50786248 1.1068225 -1.2117642  2.484202941
+Arizona    0.07163341 1.4788032  0.9989801  1.042878388
+Arkansas   0.23234938 0.2308680 -1.0735927 -0.184916602
+California 0.27826823 1.2628144  1.7589234  2.067820292
+Colorado   0.02571456 0.3988593  0.8608085  1.864967207</code></pre>
+</div>
+</div>
+<p>La función que implementa el algoritmo AGNES en R es <code>agnes</code> (ninguna sorpresa). Uno de sus resultados es el campo <code>ac</code>, que mide el coeficiente aglomerativo del resultado. Éste cuantifica la cantidad de estructura de agrupaciones que se ha encontrado (mejores valores cercanos a 1).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clustering jerárquico (enlace completo)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>hc2 <span class="ot">&lt;-</span> <span class="fu">agnes</span>(df, <span class="at">method =</span> <span class="st">"complete"</span> )</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>hc2<span class="sc">$</span>ac</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8531583</code></pre>
+</div>
+</div>
+<p>Comparemos diferentes métodos de conexión para el agrupamiento jerárquico.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Métodos evaluados</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">"average"</span>, <span class="st">"single"</span>, <span class="st">"complete"</span>, <span class="st">"ward"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(m) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">"average"</span>, <span class="st">"single"</span>, <span class="st">"complete"</span>, <span class="st">"ward"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Función para calcular el coeficiente de agrupamiento</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>ac <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">agnes</span>(df, <span class="at">method =</span> x)<span class="sc">$</span>ac</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(m, ac)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  average    single  complete      ward 
+0.7379371 0.6276128 0.8531583 0.9346210 </code></pre>
+</div>
+</div>
+<p>El siguiente dendograma utiliza un método de enlazado completo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Matriz de disimilaridades</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">dist</span>(df, <span class="at">method =</span> <span class="st">"euclidean"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Clustering jerárquico usando enlace completo</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>hc1 <span class="ot">&lt;-</span> <span class="fu">hclust</span>(d, <span class="at">method =</span> <span class="st">"complete"</span> )</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Dendrograma</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(hc1, <span class="at">cex =</span> <span class="fl">0.6</span>, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-agnes-dendogram-comp" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agnes-dendogram-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="04-clust-jer_files/figure-html/fig-agnes-dendogram-comp-1.png" id="fig-agnes-dendogram-comp" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-agnes-dendogram-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;4.1
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Sin embargo, si cambiamos al método de enlazado de Ward obtenemos resultados diferentes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>hc2 <span class="ot">&lt;-</span> <span class="fu">agnes</span>(df, <span class="at">method =</span> <span class="st">"ward"</span> )</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Drendrograma</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">pltree</span>(hc2, <span class="at">cex =</span> <span class="fl">0.6</span>, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">main =</span> <span class="st">"Dendrograma de AGNES (método Ward)"</span>) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-agnes-dendogram-ward" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agnes-dendogram-ward-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="04-clust-jer_files/figure-html/fig-agnes-dendogram-ward-1.png" id="fig-agnes-dendogram-ward" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-agnes-dendogram-ward-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;4.2
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>En función de a qué altura cortemos el árbol, obtenemos diferentes agrupamientos.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Método de Ward</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>hc5 <span class="ot">&lt;-</span> <span class="fu">hclust</span>(d, <span class="at">method =</span> <span class="st">"ward.D2"</span> )</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Cortamos en 4 clusters</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>sub_grp <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc5, <span class="at">k =</span> <span class="dv">4</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizamos el corte en el dendrograma</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(hc5, <span class="at">cex =</span> <span class="fl">0.6</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">rect.hclust</span>(hc5, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">border =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">5</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-agnes-dendogram-ward-cut" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agnes-dendogram-ward-cut-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="04-clust-jer_files/figure-html/fig-agnes-dendogram-ward-cut-1.png" id="fig-agnes-dendogram-ward-cut" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-agnes-dendogram-ward-cut-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;4.3
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Podemos ver el número de observaciones en cada grupo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(sub_grp)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>sub_grp
+ 1  2  3  4 
+ 7 12 19 12 </code></pre>
+</div>
+</div>
+<p>También se puede representar gráficamente el resultado, ya que la función <code>fviz_cluster</code> acepta este tipo de objetos.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="fu">list</span>(<span class="at">data=</span>df,<span class="at">cluster=</span>sub_grp))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-agnes-dendogram-ward-plot" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agnes-dendogram-ward-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="04-clust-jer_files/figure-html/fig-agnes-dendogram-ward-plot-1.png" id="fig-agnes-dendogram-ward-plot" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-agnes-dendogram-ward-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;4.4
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Además, podemos usar <code>fviz_nbclust</code> para utilizar un método de evaluación de los agrupamientos obtenidos con diferentes valores de grupos, y así decidir la mejor opción de configuración (en este caso, a qué altura cortamos el árbol). En el siguiente ejemplo se usa la WCSS.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(df, <span class="at">FUN =</span> hcut, <span class="at">method =</span> <span class="st">"wss"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-agnes-dendogram-ward-eval-wss" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agnes-dendogram-ward-eval-wss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="04-clust-jer_files/figure-html/fig-agnes-dendogram-ward-eval-wss-1.png" id="fig-agnes-dendogram-ward-eval-wss" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-agnes-dendogram-ward-eval-wss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;4.5
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>O también el método de la silueta. Métodos diferentes de evaluación pueden arrojar conclusiones distintas.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(df, <span class="at">FUN =</span> hcut, <span class="at">method =</span> <span class="st">"silhouette"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-agnes-dendogram-ward-eval-silh" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agnes-dendogram-ward-eval-silh-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="04-clust-jer_files/figure-html/fig-agnes-dendogram-ward-eval-silh-1.png" id="fig-agnes-dendogram-ward-eval-silh" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-agnes-dendogram-ward-eval-silh-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;4.6
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="dbscan" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="dbscan"><span class="header-section-number">4.2</span> DBSCAN</h2>
+<section id="ejemplo-básico-con-r" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="ejemplo-básico-con-r"><span class="header-section-number">4.2.1</span> Ejemplo básico con R</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dbscan)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>
 Adjuntando el paquete: 'dbscan'</code></pre>
@@ -334,25 +510,25 @@ Adjuntando el paquete: 'dbscan'</code></pre>
 
     as.dendrogram</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Datos de ejemplo</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"moons"</span>, <span class="at">package =</span> <span class="st">"dbscan"</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Ejecución del algoritmo</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># eps: radio de búsqueda</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># minPts: puntos mínimos para considerar núcleo</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">dbscan</span>(moons, <span class="at">eps =</span> <span class="fl">0.3</span>, <span class="at">minPts =</span> <span class="dv">5</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualización</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(moons, <span class="fu">aes</span>(X, Y, <span class="at">color =</span> <span class="fu">factor</span>(res<span class="sc">$</span>cluster))) <span class="sc">+</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Resultado DBSCAN"</span>, <span class="at">color =</span> <span class="st">"Cluster (0 = Ruido)"</span>) <span class="sc">+</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Datos de ejemplo</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"moons"</span>, <span class="at">package =</span> <span class="st">"dbscan"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Ejecución del algoritmo</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># eps: radio de búsqueda</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># minPts: puntos mínimos para considerar núcleo</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">dbscan</span>(moons, <span class="at">eps =</span> <span class="fl">0.3</span>, <span class="at">minPts =</span> <span class="dv">5</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualización</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(moons, <span class="fu">aes</span>(X, Y, <span class="at">color =</span> <span class="fu">factor</span>(res<span class="sc">$</span>cluster))) <span class="sc">+</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Resultado DBSCAN"</span>, <span class="at">color =</span> <span class="st">"Cluster (0 = Ruido)"</span>) <span class="sc">+</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="04-clust-jer_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="04-clust-jer_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
