@@ -143,7 +143,9 @@ data("moons", package = "dbscan")
 # Ejecución del algoritmo
 # eps: radio de búsqueda
 # minPts: puntos mínimos para considerar núcleo
-res <- dbscan(moons, eps = 0.3, minPts = 5)
+# Jugar con el valor de eps para comparar resultados
+# El valor óptimo es eps = 0.4, para que no haya puntos de ruido
+res <- dbscan(moons, eps = 0.4, minPts = 5) 
 
 # Visualización
 ggplot(moons, aes(X, Y, color = factor(res$cluster))) +
